@@ -1,6 +1,6 @@
 import unittest
-import ia.mathematics.arithmetics
-import ia.mathematics.fibonacci
+import inventoryanalytics.mathematics.arithmetics
+import inventoryanalytics.mathematics.fibonacci
 
 class TestStringMethods(unittest.TestCase):
 
@@ -19,10 +19,10 @@ class TestStringMethods(unittest.TestCase):
             s.split(2)
     
     def test_sum(self):
-        self.assertEqual(ia.mathematics.arithmetics.sum(1,2),3)
+        self.assertEqual(inventoryanalytics.mathematics.arithmetics.sum(1,2),3)
 
     def test_fib(self):
-        self.assertEqual(ia.mathematics.fibonacci.fib2(2),[1,1])
+        self.assertEqual(inventoryanalytics.mathematics.fibonacci.fib2(2),[1,1])
 
 if __name__ == '__main__':
     unittest.main()

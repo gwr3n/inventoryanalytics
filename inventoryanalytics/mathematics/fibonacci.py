@@ -1,7 +1,7 @@
 '''
 
 '''
-from ia.utils import memoize as mem
+from inventoryanalytics.utils import memoize as mem
 
 # Fibonacci numbers module
 
