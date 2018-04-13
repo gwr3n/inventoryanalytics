@@ -39,7 +39,8 @@ class WagnerWhitin:
         '''
         m = sp(np.array(self.cycle_cost_matrix()))
         pred = sp(np.array(self.cycle_cost_matrix()),return_predecessors=True)[1][0,:]
-        s, p, cost = len(self.d), pred[len(self.d)-1], 0
+        T = len(self.d)
+        s, p, cost = T, pred[T-1], 0
         while p > 0: 
             cost += m[p][s-1]
             s, p = p, pred[p]
@@ -50,8 +51,9 @@ class WagnerWhitin:
         Compute optimal Wagner-Whitin order quantities
         '''
         pred = sp(np.array(self.cycle_cost_matrix()),return_predecessors=True)[1][0,:]
-        s, p = len(self.d), pred[len(self.d)-1]
-        qty = [0 for k in range(0,len(self.d))]
+        T = len(self.d)
+        s, p = T, pred[T-1]
+        qty = [0 for k in range(0,T)]
         while p > 0: 
             qty[p] = sum([self.d[k] for k in range(p,s)])
             s, p = p, pred[p]
