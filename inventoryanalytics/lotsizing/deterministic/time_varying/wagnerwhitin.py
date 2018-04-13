@@ -26,14 +26,14 @@ class WagnerWhitin:
         '''
         return self.K + self.h*sum([(k-i)*self.d[k] for k in range(i,j+1)]) if i<=j else 0
 
-    def cycle_cost_matrix(self):
+    def cycle_cost_matrix(self) -> List[float]:
         '''
         Compute a matrix with the cost of every possible replenishment cycle
         '''
         T = len(self.d)
         return [[self.cycle_cost(i,j) for j in range(0,T)] for i in range(0,T)]
 
-    def optimal_cost(self):
+    def optimal_cost(self) -> float:
         '''
         Compute the cost of an optimal solution to the Wagner-Whitin problem
         '''
@@ -46,7 +46,7 @@ class WagnerWhitin:
             s, p = p, pred[p]
         return cost + m[p][s-1]
 
-    def order_quantities(self):
+    def order_quantities(self) -> List[float]:
         '''
         Compute optimal Wagner-Whitin order quantities
         '''
