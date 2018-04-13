@@ -74,7 +74,7 @@ class ZhengFedergruen(object):
                     s += 1
                 c0 = self.c(s,S0)
             S += 1
-            print(str(s) + " " + str(S))
+            #print(str(s) + " " + str(S))
         self.s_star = s
         self.S_star = S0
         return s, S0
