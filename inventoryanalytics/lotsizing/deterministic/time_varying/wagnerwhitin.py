@@ -39,8 +39,7 @@ class WagnerWhitin:
         Compute a matrix with the cost of every possible replenishment cycle
         '''
         T = len(self.d)
-        return [[self.cycle_cost(i,j) for j in range(0,T)] 
-                for i in range(0,T)]
+        return [[self.cycle_cost(i,j) for j in range(0,T)] for i in range(0,T)]
 
     def optimal_cost(self) -> float:
         '''
