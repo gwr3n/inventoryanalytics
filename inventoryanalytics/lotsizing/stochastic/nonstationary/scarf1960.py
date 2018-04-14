@@ -119,10 +119,10 @@ class StochasticLotSizing:
                        (self.__f(self.st(s, a, p[0])) if s.t < self.T else 0))  # future cost
                   for p in self.pmf[s.t]])                                      # demand realisations
              for a in self.ag(s)])                                              # actions
-        exp_val = lambda a: sum([p[1]*(self.iv(s, a, p[0])+
-                                      (self.__f(self.st(s, a, p[0])) if s.t < self.T else 0)) 
-                                 for p in self.pmf[s.t]]) == v
-        q = filter(exp_val, self.ag(s))                                         # retrieve best action
+        opt_a = lambda a: sum([p[1]*(self.iv(s, a, p[0])+
+                                    (self.__f(self.st(s, a, p[0])) if s.t < self.T else 0)) 
+                               for p in self.pmf[s.t]]) == v
+        q = filter(opt_a, self.ag(s))                                           # retrieve best action
         self.cache_actions[str(s)]=q                                            # store action in dictionary
         return v                                                                # return expected total cost
 
