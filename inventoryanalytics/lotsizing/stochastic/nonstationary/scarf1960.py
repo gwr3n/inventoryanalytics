@@ -99,8 +99,8 @@ class StochasticLotSizing:
             float -- the optimal order quantity 
         """
 
-        q = [k for k in self.cache_actions[str(State(0, level))]] 
-        return q[0] if bool(q) else None
+        s = State(0,level)
+        return self.cache_actions[str(s)]
 
     @mem.memoize
     def __f(self, s: State) -> float:
@@ -121,13 +121,13 @@ class StochasticLotSizing:
              for a in self.ag(s)])                                              # actions
         opt_a = lambda a: sum([p[1]*(self.iv(s, a, p[0])+
                                     (self.__f(self.st(s, a, p[0])) if s.t < self.T else 0)) 
-                               for p in self.pmf[s.t]]) == v
-        q = filter(opt_a, self.ag(s))                                           # retrieve best action
-        self.cache_actions[str(s)]=q                                            # store action in dictionary
+                               for p in self.pmf[s.t]]) == v          
+        q = [k for k in filter(opt_a, self.ag(s))]                              # retrieve best action list
+        self.cache_actions[str(s)]=q[0] if bool(q) else None                    # store an action in dictionary
         return v                                                                # return expected total cost
 
 if __name__ == '__main__':
-    instance = {"K": 100, "v": 0, "h":1, "p":10, "C":None, "d":[20,40,60,40]}
+    instance = {"K": 100, "v": 0, "h": 1, "p": 10, "C": None, "d": [20,40,60,40]}
     lot_sizing = StochasticLotSizing(**instance)
     initial_inventory_level = 0
     print("Optimal policy cost: "    + str(lot_sizing.f(initial_inventory_level)))

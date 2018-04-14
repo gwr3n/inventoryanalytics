@@ -9,6 +9,7 @@ class TestScarf1960(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @unittest.skip("Time consuming test")
     def test_scarf_1960(self):
         lot_sizing = scarf.StochasticLotSizing(**self.input)
         level = 0
