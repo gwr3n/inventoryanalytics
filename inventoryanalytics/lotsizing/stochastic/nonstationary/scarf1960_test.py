@@ -16,9 +16,10 @@ class TestScarf1960(unittest.TestCase):
         self.assertEqual(lot_sizing.q(level), 67)
 
     def test_state(self):
-        state_1 = scarf.StochasticLotSizing.State(0,10)
-        state_2 = scarf.StochasticLotSizing.State(0,20)
-        state_3 = scarf.StochasticLotSizing.State(0,20)
+        state_1 = scarf.State(0,10)
+        state_2 = scarf.State(0,20)
+        state_3 = scarf.State(0,20)
+        print(type(state_1))
         self.assertEqual(state_1 == state_2, False)
         self.assertEqual(state_2 == state_3, True)
         self.assertEqual(str(state_2), str(0)+" "+str(20))

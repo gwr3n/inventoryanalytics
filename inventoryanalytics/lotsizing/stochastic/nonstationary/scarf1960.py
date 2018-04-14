@@ -2,71 +2,133 @@ from typing import List
 from inventoryanalytics.utils import memoize as mem
 import scipy.stats as sp
 
-'''
-The nonstationary stochastic lot sizing problem.
+class State:
+    """
+    The state of the inventory system.
+    
+    Returns:
+        [type] -- state of the inventory system
+    """
 
-Herbert E. Scarf. Optimality of (s,S) policies in the 
-dynamic inventory problem. In K. J. Arrow, S. Karlin, 
-and P. Suppes, editors, Mathematical Methods in the 
-Social Sciences, pages 196–202. Stanford University 
-Press, Stanford, CA, 1960.
-'''
+    def __init__(self, t: int, I: float):
+        self.t, self.I = t, I
+
+    def __eq__(self, other): 
+        return self.__dict__ == other.__dict__
+
+    def __str__(self):
+        return str(self.t) + " " + str(self.I)
+
+    def __hash__(self):
+        return hash(str(self))
 
 class StochasticLotSizing:
+    """
+    The nonstationary stochastic lot sizing problem.
 
-    maxInv = 200     #max inventory
-    qt = 0.9999      #quantile_truncation
-    
+    Herbert E. Scarf. Optimality of (s,S) policies in the 
+    dynamic inventory problem. In K. J. Arrow, S. Karlin, 
+    and P. Suppes, editors, Mathematical Methods in the 
+    Social Sciences, pages 196–202. Stanford University 
+    Press, Stanford, CA, 1960.
+
+    Returns:
+        [type] -- A problem instance
+    """
+
+
+    M = 200         #max inventory
+    qt = 0.9999     #quantile_truncation
+
     def __init__(self, K: float, v: float, h: float, p: float, C: float, d: List[float]):
-        self.T, self.K, self.v, self.h, self.p, self.C, self.d, q = len(d)-1, K, v, h, p, C, d, StochasticLotSizing.qt
-        self.pmf = [[[k, sp.poisson(d).pmf(k)/q] for k in range(0,sp.poisson(d).ppf(q).astype(int))] for d in self.d]
-        self.ag = lambda s: [x for x in range(0,StochasticLotSizing.maxInv-s.I)] # action generator
-        self.st = lambda s, a, d: self.State(s.t+1,s.I+a-d) # state transition
-        self.iv = lambda s, a, d: (self.K if a > 0 else 0) + self.h*max(s.I+a-d,0) + self.p*max(d-s.I-a,0) # immediate value
-        self.cache_actions = {}
+        """
+        Create an instance of StochasticLotSizing.
+        
+        Arguments:
+            K {float} -- the fixed ordering cost
+            v {float} -- the proportional unit ordering cost
+            h {float} -- the proportional unit inventory holding cost
+            p {float} -- the proportional unit inventory penalty cost
+            C {float} -- the ordering capacity
+            d {List[float]} -- the demand probability mass function 
+              taking the form [[d_1,p_1],...,[d_N,p_N]], where d_k is 
+              the k-th value in the demand support and p_k is its 
+              probability.
+        """
+        #placeholders
+        max_inv, q = StochasticLotSizing.M, StochasticLotSizing.qt      # max inventory level
+        max_demand = lambda d: sp.poisson(d).ppf(q).astype(int)         # max demand in the support
+        
+        #initialize instance variables
+        self.T, self.K, self.v, self.h, self.p, self.C, self.d = len(d)-1, K, v, h, p, C, d
+        
+        pmf = lambda d, k : sp.poisson(d).pmf(k)/q                      # poisson pmf
+        self.pmf = [[[k, pmf(d, k)] for k in range(0, max_demand(d))] for d in self.d]
+        self.ag = lambda s: [x for x in range(0, max_inv-s.I)]          # action generator
+        self.st = lambda s, a, d: State(s.t+1, s.I+a-d)                 # state transition
+        
+        L = lambda i,a,d : self.h*max(i+a-d, 0) + self.p*max(d-i-a, 0)  # immediate holding/penalty cost
+        self.iv = lambda s, a, d: (self.K if a > 0 else 0) + L(s.I, a, d) # immediate value function
+
+        self.cache_actions = {}                                         # cache with optimal state/action pairs
 
     def f(self, level: float) -> float:
-        '''
+        """
         Recursively solve the nonstationary stochastic lot sizing problem
         for an initial inventory level.
-        '''
-        s = self.State(0,level)
+        
+        Arguments:
+            level {float} -- the initial inventory level
+        
+        Returns:
+            float -- the cost of an optimal policy 
+        """
+
+        s = State(0,level)
         return self.__f(s)
     
     def q(self, level:float) -> float:
-        '''
+        """
         Retrieves the optimal order quantity for a given initial inventory level.
         Function :func:`f` must have been called before using this method.
-        '''
-        s = self.State(0,level)
-        for k in self.cache_actions[str(s)]: 
-            return k
-        return None
+
+        Arguments:
+            level {float} -- the initial inventory level
+        
+        Returns:
+            float -- the optimal order quantity 
+        """
+
+        q = [k for k in self.cache_actions[str(State(0, level))]] 
+        return q[0] if bool(q) else None
 
     @mem.memoize
-    def __f(self, s) -> float:
-        v = min([sum([p[1]*(self.iv(s,a,p[0])+(self.__f(self.st(s,a,p[0])) if s.t < self.T else 0)) for p in self.pmf[s.t]]) for a in self.ag(s)])
-        q = filter(lambda a: sum([p[1]*(self.iv(s,a,p[0])+(self.__f(self.st(s,a,p[0])) if s.t < self.T else 0)) for p in self.pmf[s.t]]) == v, self.ag(s))
-        self.cache_actions[str(s)]=q
-        return v 
-
-    class State:
-
-        def __init__(self, t: int, I: float):
-            self.t, self.I = t, I
-
-        def __eq__(self, other): 
-            return self.__dict__ == other.__dict__
-
-        def __str__(self):
-            return str(self.t) + " " + str(self.I)
-
-        def __hash__(self):
-            return hash(str(self))    
+    def __f(self, s: State) -> float:
+        """
+        Dynamic programming forward recursion.
+        
+        Arguments:
+            s {State} -- the initial state
+        
+        Returns:
+            float -- the cost of an optimal policy 
+        """
+        #Forward recursion
+        v = min(
+            [sum([p[1]*(self.iv(s, a, p[0])+                                    # immediate cost
+                       (self.__f(self.st(s, a, p[0])) if s.t < self.T else 0))  # future cost
+                  for p in self.pmf[s.t]])                                      # demand realisations
+             for a in self.ag(s)])                                              # actions
+        exp_val = lambda a: sum([p[1]*(self.iv(s, a, p[0])+
+                                      (self.__f(self.st(s, a, p[0])) if s.t < self.T else 0)) 
+                                 for p in self.pmf[s.t]]) == v
+        q = filter(exp_val, self.ag(s))                                         # retrieve best action
+        self.cache_actions[str(s)]=q                                            # store action in dictionary
+        return v                                                                # return expected total cost
 
 if __name__ == '__main__':
     instance = {"K": 100, "v": 0, "h":1, "p":10, "C":None, "d":[20,40,60,40]}
     lot_sizing = StochasticLotSizing(**instance)
-    level = 0
-    print("Optimal policy cost: " + str(lot_sizing.f(level)))
-    print("Optimal order quantity: " + str(lot_sizing.q(level)))
+    initial_inventory_level = 0
+    print("Optimal policy cost: "    + str(lot_sizing.f(initial_inventory_level)))
+    print("Optimal order quantity: " + str(lot_sizing.q(initial_inventory_level)))
