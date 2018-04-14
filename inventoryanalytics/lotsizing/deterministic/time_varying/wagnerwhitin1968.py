@@ -19,9 +19,7 @@ class WagnerWhitin:
         h: the per unit holding cost;
         d: the demand in each period.
         '''
-        self.K = K #The fixed ordering cost
-        self.h = h #The per unit holding cost
-        self.d = d #The demand in each period
+        self.K, self.h, self.d = K, h, d
         self.cost_matrix = sp(np.array(self.cycle_cost_matrix()))
         self.predecessors = sp(np.array(self.cycle_cost_matrix()),
                                         return_predecessors=True)[1][0,:]

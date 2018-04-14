@@ -1,5 +1,5 @@
 import unittest
-import inventoryanalytics.lotsizing.deterministic.time_varying.wagnerwhitin as ww
+import inventoryanalytics.lotsizing.deterministic.time_varying.wagnerwhitin1968 as ww
 
 class TestWagnerWhitin(unittest.TestCase):
 

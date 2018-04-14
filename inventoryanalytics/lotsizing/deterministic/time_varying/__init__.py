@@ -1,1 +1,1 @@
-__all__ = ["wagnerwhitin"]
+__all__ = ["wagnerwhitin1968"]
