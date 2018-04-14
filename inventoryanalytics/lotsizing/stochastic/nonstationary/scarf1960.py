@@ -20,8 +20,8 @@ class StochasticLotSizing:
     def __init__(self, K: float, v: float, h: float, p: float, C: float, d: List[float]):
         self.T, self.K, self.v, self.h, self.p, self.C, self.d, q = len(d)-1, K, v, h, p, C, d, StochasticLotSizing.qt
         self.pmf = [[[k, sp.poisson(d).pmf(k)/q] for k in range(0,sp.poisson(d).ppf(q).astype(int))] for d in self.d]
-        self.ag = lambda s: [x for x in range(0,StochasticLotSizing.maxInv-s.I)]         #action generator
-        self.st = lambda s, a, d: self.State(s.t+1,s.I+a-d)       #state transition
+        self.ag = lambda s: [x for x in range(0,StochasticLotSizing.maxInv-s.I)] # action generator
+        self.st = lambda s, a, d: self.State(s.t+1,s.I+a-d) # state transition
         self.iv = lambda s, a, d: (self.K if a > 0 else 0) + self.h*max(s.I+a-d,0) + self.p*max(d-s.I-a,0) # immediate value
         self.cache_actions = {}
 
