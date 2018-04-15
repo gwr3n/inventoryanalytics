@@ -9,6 +9,7 @@ Copyright (c) 2018 Roberto Rossi
 '''
 
 import numpy as np
+from scipy.optimize import minimize
 
 class eoq:
     '''
@@ -40,19 +41,24 @@ class eoq:
             float -- the Economic Order Quantity
         """
 
-        K, h, d = self.K, self.h, self.d
-        return np.sqrt(2*d*K/h)
+        x0 = 1 # start from a positive EOQ
+        res = minimize(self.compute_eoq_cost, x0, method='nelder-mead', 
+                       options={'xtol': 1e-8, 'disp': False})
+        return res.x[0]
 
-    def compute_eoq_cost(self) -> float:
+    def compute_eoq_cost(self, Q: float) -> float:
         """
         Computes the optimal cost per unit period.
         
+        Arguments:
+            Q {float} -- the order quantity
+
         Returns:
             float -- the optimal cost per unit period
         """
 
         K, h, d, p = self.K, self.h, self.d, self.p
-        return np.sqrt(2*h*d*K)+p*d
+        return (K+Q*p)/(Q/d)+h*Q/2
 
     def compute_coverage(self) -> float:
         """

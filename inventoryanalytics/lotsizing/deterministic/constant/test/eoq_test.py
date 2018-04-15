@@ -10,6 +10,7 @@ Copyright (c) 2018 Roberto Rossi
 
 import unittest
 import inventoryanalytics.lotsizing.deterministic.constant.eoq as eoq
+import numpy as np
 
 class TestEOQ(unittest.TestCase):
 
@@ -21,10 +22,17 @@ class TestEOQ(unittest.TestCase):
         pass
 
     def test_eoq(self):
+        K, h, d = self.eoq.K, self.eoq.h, self.eoq.d
+        self.assertAlmostEqual(self.eoq.compute_eoq(), 
+                               np.sqrt(2*d*K/h), places=2) # closed-form
         self.assertAlmostEqual(self.eoq.compute_eoq(), 252.98, places=2)
 
     def test_eoq_cost(self):
-        self.assertAlmostEqual(self.eoq.compute_eoq_cost(), 1020.72, places=2)
+        Q = self.eoq.compute_eoq()
+        self.assertAlmostEqual(1020.72, self.eoq.compute_eoq_cost(Q), places=2)
+        K, h, d, p = self.eoq.K, self.eoq.h, self.eoq.d, self.eoq.p
+        self.assertAlmostEqual(self.eoq.compute_eoq_cost(Q), 
+                               np.sqrt(2*K*h*d)+p*d, places=2) # closed-form
 
     def test_itr(self):
         self.assertAlmostEqual(self.eoq.compute_itr(), 18.97, places=2)
