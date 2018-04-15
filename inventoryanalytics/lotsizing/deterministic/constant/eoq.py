@@ -111,9 +111,27 @@ class eoq:
     def _plot_eoq():
         instance = {"K": 100, "h": 1, "d": 10, "p": 2}
         pb = eoq(**instance)
-        plt.plot([k for k in range(10,100)], [(pb.cost(k), pb.co(k), pb.ch(k)) for k in range(10,100)])
+        total, = plt.plot([k for k in range(10,100)], [pb.cost(k) for k in range(10,100)], label='Total cost')
+        ordering, = plt.plot([k for k in range(10,100)], [pb.co(k) for k in range(10,100)], label='Ordering cost')
+        holding, = plt.plot([k for k in range(10,100)], [pb.ch(k) for k in range(10,100)], label='Holding cost')
+
+        plt.legend(handles=[total,ordering,holding], loc=1)
+        
         plt.ylabel('EOQ cost')
         plt.show()
 
+    @staticmethod
+    def _plot_sawtooth():
+        instance = {"K": 100, "h": 1, "d": 10, "p": 2}
+        pb = eoq(**instance)
+        Q = pb.compute_eoq()
+        total, = plt.plot([k for k in range(1,100)], [Q - k % Q for k in range(1,100)], label='Inventory')
+
+        plt.legend(handles=[total], loc=1)
+        
+        plt.ylabel('EOQ cost')
+        plt.show()        
+
 if __name__ == '__main__':
-    eoq._plot_eoq()
+    #eoq._plot_eoq()
+    eoq._plot_sawtooth()
