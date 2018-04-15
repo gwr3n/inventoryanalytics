@@ -58,22 +58,20 @@ class StochasticLotSizing:
             q {float} -- quantile truncation for the demand
             initial_order {bool} -- allow order in the first period
         """
-        #placeholders
+        # placeholders
         max_demand = lambda d: sp.poisson(d).ppf(q).astype(int)         # max demand in the support
         
-        #initialize instance variables
+        # initialize instance variables
         self.T, self.K, self.v, self.h, self.p, self.d, self.max_inv = len(d)-1, K, v, h, p, d, max_inv
-        
         pmf = lambda d, k : sp.poisson(d).pmf(k)/q                      # poisson pmf
         self.pmf = [[[k, pmf(d, k)] for k in range(0, max_demand(d))] for d in self.d]
 
+        # lambdas
         if initial_order:                                               # action generator
             self.ag = lambda s: [x for x in range(0, max_inv-s.I)]      
         else: 
             self.ag = lambda s: [x for x in range(0, max_inv-s.I)] if s.t > 0 else [0] 
-
         self.st = lambda s, a, d: State(s.t+1, s.I+a-d)                 # state transition
-        
         L = lambda i,a,d : self.h*max(i+a-d, 0) + self.p*max(d-i-a, 0)  # immediate holding/penalty cost
         self.iv = lambda s, a, d: (self.K if a > 0 else 0) + L(s.I, a, d) # immediate value function
 
