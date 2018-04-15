@@ -42,11 +42,11 @@ class eoq:
         """
 
         x0 = 1 # start from a positive EOQ
-        res = minimize(self.compute_eoq_cost, x0, method='nelder-mead', 
+        res = minimize(self.cost, x0, method='nelder-mead', 
                        options={'xtol': 1e-8, 'disp': False})
         return res.x[0]
 
-    def compute_eoq_cost(self, Q: float) -> float:
+    def cost(self, Q: float) -> float:
         """
         Computes the optimal cost per unit period.
         
@@ -57,10 +57,17 @@ class eoq:
             float -- the optimal cost per unit period
         """
 
-        K, h, d, p = self.K, self.h, self.d, self.p
-        return (K+Q*p)/(Q/d)+h*Q/2
+        return self.co(Q)+self.ch(Q)
 
-    def compute_coverage(self) -> float:
+    def co(self, Q: float) -> float:
+        K, h, d, p = self.K, self.h, self.d, self.p
+        return (K+Q*p)/(Q/d)
+
+    def ch(self, Q: float) -> float:
+        K, h, d, p = self.K, self.h, self.d, self.p
+        return h*Q/2
+
+    def coverage(self) -> float:
         """
         Compute the number of periods of demand the 
         Economic Order Quantity will satisfy.
@@ -73,7 +80,7 @@ class eoq:
         d = self.d
         return self.compute_eoq()/d
 
-    def compute_itr(self) -> float:
+    def itr(self) -> float:
         """
         The Implied Turnover Ratio (ITR) represents the number of times 
         inventory is sold or used in a time period.

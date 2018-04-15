@@ -27,15 +27,15 @@ class TestEOQ(unittest.TestCase):
                                np.sqrt(2*d*K/h), places=2) # closed-form
         self.assertAlmostEqual(self.eoq.compute_eoq(), 252.98, places=2)
 
-    def test_eoq_cost(self):
+    def test_cost(self):
         Q = self.eoq.compute_eoq()
-        self.assertAlmostEqual(1020.72, self.eoq.compute_eoq_cost(Q), places=2)
+        self.assertAlmostEqual(1020.72, self.eoq.cost(Q), places=2)
         K, h, d, p = self.eoq.K, self.eoq.h, self.eoq.d, self.eoq.p
-        self.assertAlmostEqual(self.eoq.compute_eoq_cost(Q), 
+        self.assertAlmostEqual(self.eoq.cost(Q), 
                                np.sqrt(2*K*h*d)+p*d, places=2) # closed-form
 
     def test_itr(self):
-        self.assertAlmostEqual(self.eoq.compute_itr(), 18.97, places=2)
+        self.assertAlmostEqual(self.eoq.itr(), 18.97, places=2)
 
     def test_coverage(self):
-        self.assertAlmostEqual(self.eoq.compute_coverage(), 1.26/12, places=2)
+        self.assertAlmostEqual(self.eoq.coverage(), 1.26/12, places=2)
