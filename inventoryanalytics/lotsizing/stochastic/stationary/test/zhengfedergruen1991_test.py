@@ -1,5 +1,15 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 import unittest
-import inventoryanalytics.lotsizing.stochastic.stationary.zhengfedergruen as zf
+import inventoryanalytics.lotsizing.stochastic.stationary.zhengfedergruen1991 as zf
 
 class TestWagnerWhitin(unittest.TestCase):
 

@@ -1,25 +1,45 @@
 '''
-Created on 17 May 2016
+inventoryanalytics: a Python library for Inventory Analytics
 
-@author: gwren
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
 '''
+
 import numpy as np
 import functools 
 from scipy.stats import poisson
 from inventoryanalytics.utils import memoize as mem
 
 def expectation(f, x, p): # E f(X) = sum f(x_i) p_i
-    #return sum(f(x_i)*p_i for x_i, p_i in zip(x, p) )
-    # faster, but less clear perhaps
     return np.dot(f(x),p)
 
 class ZhengFedergruen(object):
-    #def __init__(self, data): #mu, K, h, b):
+    """[summary]
+    The stationary stochastic lot sizing problem.
+
+    Zheng, Y., & Federgruen, A. (1991). Finding optimal (s, s) policies is about
+    as simple as evaluating a single policy. Operations research, 39 , 654{665.
+    doi:10.1287/opre.39.4.654.
+    
+    """
+
     def __init__(self, mu, K, h, b):
-        #self.__dict__.update(**data)
-        self.K = K # setup cost
+        """
+        Constructs an instance of the stochastic lot sizing problem
+        
+        Arguments:
+            mu {[type]} -- the expected demand
+            K {[type]} -- the fixed ordering cost
+            h {[type]} -- the proportional holding cost
+            b {[type]} -- the penalty cost
+        """
+
+        self.K = K      
         self.mu = mu
-        self.p = poisson.pmf(np.arange(200), self.mu) # demand
+        self.p = poisson.pmf(np.arange(200), self.mu)
         self.h = h
         self.b = b
 
@@ -34,7 +54,7 @@ class ZhengFedergruen(object):
     def m(self, j):  # 2a
         if j == 0:
             return 1./(1. - self.p[0])
-        else: # 2b
+        else:        # 2b
             res = sum(self.p[l]*self.m(j-l) for l in range(1,j+1))
             res /= (1. - self.p[0])
             return res
@@ -56,16 +76,18 @@ class ZhengFedergruen(object):
 
 
     def findOptimalPolicy(self):
+        
         # algorithm on Page 659
         ystar = poisson.ppf(self.b/(self.b+self.h),self.mu).astype(int) #base stock level
-        s = ystar - 1 #upper bound for s
+        s = ystar - 1   #upper bound for s
         S_0 = ystar + 0 #lower bound for S_0
+
         #calculate the optimal s for S fixed at its lower bound S0
         while self.c(s,S_0) > self.G(s):
             s -= 1
-        s_0 = s # + 0 #optimal value of s for S0
+        s_0 = s # + 0   #optimal value of s for S0
         c0 = self.c(s_0,S_0) #costs for this starting value
-        S0 = S_0 #+ 0  # S0 = S^0 of the paper
+        S0 = S_0 # + 0  # S0 = S^0 of the paper
         S = S0+1
         while self.G(S) <= c0:
             if self.c(s,S) < c0:

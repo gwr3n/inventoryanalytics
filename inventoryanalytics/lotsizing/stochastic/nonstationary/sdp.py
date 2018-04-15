@@ -1,3 +1,13 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 from typing import List
 from inventoryanalytics.utils import memoize as mem
 import scipy.stats as sp
@@ -26,21 +36,12 @@ class StochasticLotSizing:
     """
     The nonstationary stochastic lot sizing problem.
 
-    Herbert E. Scarf. Optimality of (s,S) policies in the 
-    dynamic inventory problem. In K. J. Arrow, S. Karlin, 
-    and P. Suppes, editors, Mathematical Methods in the 
-    Social Sciences, pages 196–202. Stanford University 
-    Press, Stanford, CA, 1960.
-
     Returns:
         [type] -- A problem instance
     """
 
-
-    M = 200         #max inventory
-    qt = 0.9999     #quantile_truncation
-
-    def __init__(self, K: float, v: float, h: float, p: float, d: List[float]):
+    def __init__(self, K: float, v: float, h: float, p: float, d: List[float], 
+                 max_inv: float, q: float, initial_order: bool):
         """
         Create an instance of StochasticLotSizing.
         
@@ -53,17 +54,25 @@ class StochasticLotSizing:
               taking the form [[d_1,p_1],...,[d_N,p_N]], where d_k is 
               the k-th value in the demand support and p_k is its 
               probability.
+            max_inv {float} -- the maximum inventory level
+            q {float} -- quantile truncation for the demand
+            initial_order {bool} -- allow order in the first period
         """
         #placeholders
-        max_inv, q = StochasticLotSizing.M, StochasticLotSizing.qt      # max inventory level
+        #max_inv, q = StochasticLotSizing.M, StochasticLotSizing.qt      # max inventory level
         max_demand = lambda d: sp.poisson(d).ppf(q).astype(int)         # max demand in the support
         
         #initialize instance variables
-        self.T, self.K, self.v, self.h, self.p, self.d = len(d)-1, K, v, h, p, d
+        self.T, self.K, self.v, self.h, self.p, self.d, self.max_inv = len(d)-1, K, v, h, p, d, max_inv
         
         pmf = lambda d, k : sp.poisson(d).pmf(k)/q                      # poisson pmf
         self.pmf = [[[k, pmf(d, k)] for k in range(0, max_demand(d))] for d in self.d]
-        self.ag = lambda s: [x for x in range(0, max_inv-s.I)]          # action generator
+
+        if initial_order:                                               # action generator
+            self.ag = lambda s: [x for x in range(0, max_inv-s.I)]      
+        else: 
+            self.ag = lambda s: [x for x in range(0, max_inv-s.I)] if s.t > 0 else [0] 
+
         self.st = lambda s, a, d: State(s.t+1, s.I+a-d)                 # state transition
         
         L = lambda i,a,d : self.h*max(i+a-d, 0) + self.p*max(d-i-a, 0)  # immediate holding/penalty cost
@@ -103,12 +112,25 @@ class StochasticLotSizing:
         return self.cache_actions[str(s)]
 
     def extract_sS_policy(self) -> List[float]:
-        for i in range(-StochasticLotSizing.M, StochasticLotSizing.M):
+        """
+        Extract optimal (s,S) policy parameters
+
+        Herbert E. Scarf. Optimality of (s,S) policies in the 
+        dynamic inventory problem. In K. J. Arrow, S. Karlin, 
+        and P. Suppes, editors, Mathematical Methods in the 
+        Social Sciences, pages 196–202. Stanford University 
+        Press, Stanford, CA, 1960.
+        
+        Returns:
+            List[float] -- the optimal s,S policy parameters [...,[s_k,S_k],...]
+        """
+
+        for i in range(-self.max_inv, self.max_inv):
             self.f(i)
         policy_parameters = []
         for t in range(0, len(self.d)):
-            level = StochasticLotSizing.M - 1
-            min_level = -StochasticLotSizing.M
+            level = self.max_inv - 1
+            min_level = -self.max_inv
             s = State(t, level)
             while self.cache_actions.get(str(s), 0) == 0 and level > min_level:
                 level, s = level - 1, State(t, level - 1)
@@ -142,7 +164,8 @@ class StochasticLotSizing:
 
     @staticmethod
     def run_instance():
-        instance = {"K": 100, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40]}
+        instance = {"K": 100, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40], 
+                    "max_inv": 200, "q": 0.9999, "initial_order": True}
         lot_sizing = StochasticLotSizing(**instance)
         t = 0   # initial period
         i = 0   #initial inventory level
@@ -152,6 +175,13 @@ class StochasticLotSizing:
         #with open('optimal_policy.txt', 'w') as f:
         #    json.dump(lot_sizing.cache_actions, f)
         #    f.close()
+
+    @staticmethod
+    def run_instance_stationary():
+        instance = {"K": 64, "v": 0, "h": 1, "p": 9, "d": [20,20,20,20], 
+                    "max_inv": 200, "q": 0.9999, "initial_order": True}
+        lot_sizing = StochasticLotSizing(**instance)
+        print(lot_sizing.extract_sS_policy())
 
 if __name__ == '__main__':
     StochasticLotSizing.run_instance()

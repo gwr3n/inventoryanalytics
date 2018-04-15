@@ -1,1 +1,1 @@
-A library dedicated to Inventory Analytics.
+A Python library dedicated to Inventory Analytics.

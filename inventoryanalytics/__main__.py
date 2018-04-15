@@ -1,5 +1,3 @@
-import inventoryanalytics.lotsizing.stochastic.nonstationary.scarf1960 as scarf
-import json
+import inventoryanalytics.lotsizing.stochastic.nonstationary.sdp as sdp
 
-scarf.StochasticLotSizing.run_instance()
-
+sdp.StochasticLotSizing.run_instance()

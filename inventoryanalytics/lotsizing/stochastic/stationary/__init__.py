@@ -1,3 +1,3 @@
-__all__ = ["zhengfedergruen"]
+__all__ = ["zhengfedergruen1991"]
 
 from inventoryanalytics.utils import memoize
