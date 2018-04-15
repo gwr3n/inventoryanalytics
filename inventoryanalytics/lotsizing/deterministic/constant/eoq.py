@@ -1,3 +1,13 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 import numpy as np
 
 class eoq:
@@ -11,7 +21,7 @@ class eoq:
 
     def __init__(self, K: float, h: float, d: float, p: float):
         """
-        Constructs an instance of the Economic Order Quantity problem
+        Constructs an instance of the Economic Order Quantity problem.
         
         Arguments:
             K {float} -- the fixed ordering cost
@@ -24,7 +34,7 @@ class eoq:
 
     def compute_eoq(self) -> float:
         """
-        Computes the Economic Order Quantity
+        Computes the Economic Order Quantity.
         
         Returns:
             float -- the Economic Order Quantity
@@ -35,7 +45,7 @@ class eoq:
 
     def compute_eoq_cost(self) -> float:
         """
-        Computes the optimal cost per unit period
+        Computes the optimal cost per unit period.
         
         Returns:
             float -- the optimal cost per unit period
@@ -47,7 +57,7 @@ class eoq:
     def compute_coverage(self) -> float:
         """
         Compute the number of periods of demand the 
-        Economic Order Quantity will satisfy
+        Economic Order Quantity will satisfy.
         
         Returns:
             float -- the number of periods of demand the 
@@ -60,7 +70,7 @@ class eoq:
     def compute_itr(self) -> float:
         """
         The Implied Turnover Ratio (ITR) represents the number of times 
-        inventory is sold or used in a time period such as a year.
+        inventory is sold or used in a time period.
         
         Returns:
             float -- the Implied Turnover Ratio (ITR)
