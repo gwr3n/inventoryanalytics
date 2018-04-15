@@ -60,11 +60,11 @@ class eoq:
         return self.co(Q)+self.ch(Q)
 
     def co(self, Q: float) -> float:
-        K, h, d, p = self.K, self.h, self.d, self.p
+        K, d, p = self.K, self.d, self.p
         return (K+Q*p)/(Q/d)
 
     def ch(self, Q: float) -> float:
-        K, h, d, p = self.K, self.h, self.d, self.p
+        h = self.h
         return h*Q/2
 
     def coverage(self) -> float:
