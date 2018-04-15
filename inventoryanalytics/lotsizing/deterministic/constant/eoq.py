@@ -10,6 +10,7 @@ Copyright (c) 2018 Roberto Rossi
 
 import numpy as np
 from scipy.optimize import minimize
+import matplotlib.pyplot as plt
 
 class eoq:
     '''
@@ -105,3 +106,14 @@ class eoq:
 
         d = self.d
         return d*lead_time
+
+    @staticmethod
+    def _plot_eoq():
+        instance = {"K": 100, "h": 1, "d": 10, "p": 2}
+        pb = eoq(**instance)
+        plt.plot([k for k in range(10,100)], [(pb.cost(k), pb.co(k), pb.ch(k)) for k in range(10,100)])
+        plt.ylabel('EOQ cost')
+        plt.show()
+
+if __name__ == '__main__':
+    eoq._plot_eoq()
