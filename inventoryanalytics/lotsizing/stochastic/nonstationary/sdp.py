@@ -59,7 +59,6 @@ class StochasticLotSizing:
             initial_order {bool} -- allow order in the first period
         """
         #placeholders
-        #max_inv, q = StochasticLotSizing.M, StochasticLotSizing.qt      # max inventory level
         max_demand = lambda d: sp.poisson(d).ppf(q).astype(int)         # max demand in the support
         
         #initialize instance variables
