@@ -8,6 +8,7 @@ setup(
               'inventoryanalytics.lotsizing',
               'inventoryanalytics.lotsizing.deterministic',
               'inventoryanalytics.lotsizing.deterministic.constant',
+              'inventoryanalytics.lotsizing.deterministic.constant.test',
               'inventoryanalytics.lotsizing.deterministic.time_varying',
               'inventoryanalytics.lotsizing.deterministic.time_varying.test',
               'inventoryanalytics.lotsizing.stochastic',

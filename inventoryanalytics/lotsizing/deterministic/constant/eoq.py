@@ -1,0 +1,84 @@
+import numpy as np
+
+class eoq:
+    '''
+    Ford W. Harris, How Many Parts to Make at Once, Factory, 
+    The Magazine of Management, Volume 10, Number 2, February 1913, pp. 135–136, 152.
+
+    Harris, Ford W. (1990). "How Many Parts to Make at Once". Operations Research. 
+    38 (6): 947. doi:10.1287/opre.38.6.947.
+    '''
+
+    def __init__(self, K: float, h: float, d: float, p: float):
+        """
+        Constructs an instance of the Economic Order Quantity problem
+        
+        Arguments:
+            K {float} -- the fixed ordering cost
+            h {float} -- the proportional holding cost
+            d {float} -- the demand per period
+            p {float} -- the unit purchasing cost
+        """
+
+        self.K, self.h, self.d, self.p = K, h, d, p
+
+    def compute_eoq(self) -> float:
+        """
+        Computes the Economic Order Quantity
+        
+        Returns:
+            float -- the Economic Order Quantity
+        """
+
+        K, h, d = self.K, self.h, self.d
+        return np.sqrt(2*d*K/h)
+
+    def compute_eoq_cost(self) -> float:
+        """
+        Computes the optimal cost per unit period
+        
+        Returns:
+            float -- the optimal cost per unit period
+        """
+
+        K, h, d, p = self.K, self.h, self.d, self.p
+        return np.sqrt(2*h*d*K)+p*d
+
+    def compute_coverage(self) -> float:
+        """
+        Compute the number of periods of demand the 
+        Economic Order Quantity will satisfy
+        
+        Returns:
+            float -- the number of periods of demand the 
+                Economic Order Quantity will satisfy
+        """
+
+        d = self.d
+        return self.compute_eoq()/d
+
+    def compute_itr(self) -> float:
+        """
+        The Implied Turnover Ratio (ITR) represents the number of times 
+        inventory is sold or used in a time period such as a year.
+        
+        Returns:
+            float -- the Implied Turnover Ratio (ITR)
+        """
+
+        d = self.d
+        return 2*d/self.compute_eoq()
+
+    def reorder_point(self, lead_time: float) -> float:
+        """
+        Computes the reorder point for a given lead time.
+        
+        Arguments:
+            lead_time {float} -- the given lead time
+        
+        Returns:
+            float -- the reorder point
+        """
+
+        d = self.d
+        return d*lead_time
