@@ -11,6 +11,7 @@ Copyright (c) 2018 Roberto Rossi
 from typing import List
 from inventoryanalytics.utils import memoize as mem
 import scipy.stats as sp
+import json
 
 class State:
     """
@@ -160,7 +161,7 @@ class StochasticLotSizing:
         return v                                                                # return expected total cost
 
     @staticmethod
-    def run_instance():
+    def run_instance(file_name: str = None):
         instance = {"K": 100, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40], 
                     "max_inv": 200, "q": 0.9999, "initial_order": True}
         lot_sizing = StochasticLotSizing(**instance)
@@ -169,9 +170,14 @@ class StochasticLotSizing:
         print("Optimal policy cost: "    + str(lot_sizing.f(i)))
         print("Optimal order quantity: " + str(lot_sizing.q(t, i)))
         print(lot_sizing.extract_sS_policy())
-        #with open('optimal_policy.txt', 'w') as f:
-        #    json.dump(lot_sizing.cache_actions, f)
-        #    f.close()
+
+        try:
+            with open(file_name, 'w') as f:
+                json.dump(lot_sizing.cache_actions, f)
+                f.close()
+                print("Policy saved to "+file_name) 
+        except:
+            print("Provide a file name to save the policy to disk.") 
 
     @staticmethod
     def run_instance_stationary():
