@@ -403,7 +403,111 @@ class eoq_planned_backorders:
         print(pb.relevant_cost(Qopt))
 
 class epq:
-    pass
+    def __init__(self, K: float, h: float, d: float, v: float, p: float):
+        """
+        Constructs an instance of the Economic Order Quantity problem.
+        
+        Arguments:
+            K {float} -- the fixed ordering cost
+            h {float} -- the proportional holding cost
+            d {float} -- the demand per period
+            v {float} -- the unit purchasing cost
+            p {float} -- the finite production rate
+        """
+
+        self.K, self.h, self.d, self.v, self.p = K, h, d, v, p
+
+    def compute_eoq(self) -> float:
+        """
+        Computes the Economic Order Quantity.
+        
+        Returns:
+            float -- the Economic Order Quantity
+        """
+
+        x0 = 1 # start from a positive EOQ
+        res = minimize(self.relevant_cost, x0, method='nelder-mead', 
+                       options={'xtol': 1e-8, 'disp': False})
+        return res.x[0]
+
+    def relevant_cost(self, Q: float) -> float:
+        """
+        Computes the relevant cost (ignoring the unit production cost) 
+        per unit period for a given quantity Q.
+        
+        Arguments:
+            Q {float} -- the order quantity
+
+        Returns:
+            float -- the optimal cost per unit period
+        """
+
+        return self.co_fixed(Q)+self.ch(Q)
+
+    def cost(self, Q: float) -> float:
+        """
+        Computes the total cost per unit period for a given quantity Q.
+        
+        Arguments:
+            Q {float} -- the order quantity
+
+        Returns:
+            float -- the optimal cost per unit period
+        """
+
+        return self.co_fixed(Q)+self.co_variable(Q)+self.ch(Q)
+
+    def co_fixed(self, Q: float) -> float:
+        """
+        Computes the fixed ordering cost
+        
+        Arguments:
+            Q {float} -- the order quantity
+        
+        Returns:
+            float -- the fixed ordering cost
+        """
+
+        K, d= self.K, self.d
+        return K/(Q/d)
+
+    def co_variable(self, Q: float) -> float:
+        """
+        Computes the variable ordering cost
+        
+        Arguments:
+            Q {float} -- the order quantity
+        
+        Returns:
+            float -- the variable ordering cost
+        """        
+        d, v = self.d, self.v
+        return d*v
+
+    def ch(self, Q: float) -> float:
+        """
+        Computes the inventory holding cost
+        
+        Arguments:
+            Q {float} -- the order quantity
+        
+        Returns:
+            float -- the inventory holding cost
+        """
+        h = self.h
+        rho = self.p/self.d
+        return h*Q*(1-rho)/2
+
+    @staticmethod
+    def _sample_instance():
+        instance = {"K": 100, "h": 1, "d": 10, "v": 2, "p": 5}
+        #instance = {"K": 8, "h": 0.3*0.75, "d": 1300, "v": 75, "p": 5}
+        pb = epq(**instance)
+        Qopt = pb.compute_eoq()
+        print(Qopt)
+        rho = pb.p/pb.d
+        print(np.sqrt(2*pb.K*pb.d/(pb.h*(1-rho))))
+        print(np.sqrt(2*pb.K*pb.d*(pb.h*(1-rho))))
 
 if __name__ == '__main__':
     #eoq._plot_eoq()
@@ -411,4 +515,5 @@ if __name__ == '__main__':
     #eoq._plot_sensitivity_to_K()
     #eoq._plot_sensitivity_to_h()
     #eoq._sample_instance()
-    eoq_planned_backorders._sample_instance()
+    #eoq_planned_backorders._sample_instance()
+    epq._sample_instance()
