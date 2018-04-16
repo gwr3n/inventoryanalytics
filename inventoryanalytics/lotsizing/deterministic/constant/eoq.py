@@ -8,7 +8,6 @@ MIT License
 Copyright (c) 2018 Roberto Rossi
 '''
 
-import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
@@ -21,7 +20,7 @@ class eoq:
     38 (6): 947. doi:10.1287/opre.38.6.947.
     '''
 
-    def __init__(self, K: float, h: float, d: float, p: float):
+    def __init__(self, K: float, h: float, d: float, v: float):
         """
         Constructs an instance of the Economic Order Quantity problem.
         
@@ -29,10 +28,10 @@ class eoq:
             K {float} -- the fixed ordering cost
             h {float} -- the proportional holding cost
             d {float} -- the demand per period
-            p {float} -- the unit purchasing cost
+            v {float} -- the unit purchasing cost
         """
 
-        self.K, self.h, self.d, self.p = K, h, d, p
+        self.K, self.h, self.d, self.v = K, h, d, v
 
     def compute_eoq(self) -> float:
         """
@@ -43,13 +42,14 @@ class eoq:
         """
 
         x0 = 1 # start from a positive EOQ
-        res = minimize(self.cost, x0, method='nelder-mead', 
+        res = minimize(self.relevant_cost, x0, method='nelder-mead', 
                        options={'xtol': 1e-8, 'disp': False})
         return res.x[0]
 
-    def cost(self, Q: float) -> float:
+    def relevant_cost(self, Q: float) -> float:
         """
-        Computes the optimal cost per unit period.
+        Computes the relevant cost (ignoring the unit production cost) 
+        per unit period for a given quantity Q.
         
         Arguments:
             Q {float} -- the order quantity
@@ -58,13 +58,58 @@ class eoq:
             float -- the optimal cost per unit period
         """
 
-        return self.co(Q)+self.ch(Q)
+        return self.co_fixed(Q)+self.ch(Q)
 
-    def co(self, Q: float) -> float:
-        K, d, p = self.K, self.d, self.p
-        return (K+Q*p)/(Q/d)
+    def cost(self, Q: float) -> float:
+        """
+        Computes the total cost per unit period for a given quantity Q.
+        
+        Arguments:
+            Q {float} -- the order quantity
+
+        Returns:
+            float -- the optimal cost per unit period
+        """
+
+        return self.co_fixed(Q)+self.co_variable(Q)+self.ch(Q)
+
+    def co_fixed(self, Q: float) -> float:
+        """
+        Computes the fixed ordering cost
+        
+        Arguments:
+            Q {float} -- the order quantity
+        
+        Returns:
+            float -- the fixed ordering cost
+        """
+
+        K, d= self.K, self.d
+        return K/(Q/d)
+
+    def co_variable(self, Q: float) -> float:
+        """
+        Computes the variable ordering cost
+        
+        Arguments:
+            Q {float} -- the order quantity
+        
+        Returns:
+            float -- the variable ordering cost
+        """        
+        d, v = self.d, self.v
+        return d*v
 
     def ch(self, Q: float) -> float:
+        """
+        Computes the inventory holding cost
+        
+        Arguments:
+            Q {float} -- the order quantity
+        
+        Returns:
+            float -- the inventory holding cost
+        """
         h = self.h
         return h*Q/2
 
@@ -81,6 +126,16 @@ class eoq:
         d = self.d
         return self.compute_eoq()/d
 
+    def average_inventory(self) -> float:
+        """
+        Computes the average inventory level 
+        
+        Returns:
+            float -- the average inventory level 
+        """
+
+        return self.compute_eoq()/2
+
     def itr(self) -> float:
         """
         The Implied Turnover Ratio (ITR) represents the number of times 
@@ -92,6 +147,22 @@ class eoq:
 
         d = self.d
         return 2*d/self.compute_eoq()
+
+    def sensitivity_to_Q(self, Q: float) -> float:
+        """
+        Computes the additional cost faced if the 
+        chosen order quantity `Q` deviates from the 
+        optimal order quantity.
+        
+        Arguments:
+            Q {float} -- the target order quantity
+        
+        Returns:
+            float -- a ratio indicating the percent 
+                increase, e.g. 1.05 is a 5% increase
+        """
+        Qopt = self.compute_eoq()
+        return 0.5*(Qopt/Q+Q/Qopt)
 
     def reorder_point(self, lead_time: float) -> float:
         """
@@ -109,29 +180,41 @@ class eoq:
 
     @staticmethod
     def _plot_eoq():
-        instance = {"K": 100, "h": 1, "d": 10, "p": 2}
+        instance = {"K": 100, "h": 1, "d": 10, "v": 2}
         pb = eoq(**instance)
-        total, = plt.plot([k for k in range(10,100)], [pb.cost(k) for k in range(10,100)], label='Total cost')
-        ordering, = plt.plot([k for k in range(10,100)], [pb.co(k) for k in range(10,100)], label='Ordering cost')
-        holding, = plt.plot([k for k in range(10,100)], [pb.ch(k) for k in range(10,100)], label='Holding cost')
-
+        total, = plt.plot([k for k in range(10,100)], 
+                          [pb.relevant_cost(k) for k in range(10,100)], 
+                          label='Total relevant cost')
+        ordering, = plt.plot([k for k in range(10,100)], 
+                             [pb.co_fixed(k) for k in range(10,100)], 
+                             label='Ordering cost')
+        holding, = plt.plot([k for k in range(10,100)], 
+                            [pb.ch(k) for k in range(10,100)], 
+                            label='Holding cost')
         plt.legend(handles=[total,ordering,holding], loc=1)
-        
-        plt.ylabel('EOQ cost')
+        plt.ylabel('Cost')
+        plt.xlabel('Q')
         plt.show()
+    
+    @staticmethod
+    def _plot_sensitivity_to_Q():
+        instance = {"K": 100, "h": 1, "d": 10, "v": 2}
+        pb = eoq(**instance)
+        plt.plot([k for k in range(20,80)], [pb.sensitivity_to_Q(k) for k in range(20,80)])
+        plt.ylabel('Sensitivity')
+        plt.xlabel('Q')
+        plt.show() 
 
     @staticmethod
-    def _plot_sawtooth():
-        instance = {"K": 100, "h": 1, "d": 10, "p": 2}
+    def _sample_instance():
+        instance = {"K": 100, "h": 1, "d": 10, "v": 2}
         pb = eoq(**instance)
-        Q = pb.compute_eoq()
-        total, = plt.plot([k for k in range(1,100)], [Q - k % Q for k in range(1,100)], label='Inventory')
-
-        plt.legend(handles=[total], loc=1)
-        
-        plt.ylabel('EOQ cost')
-        plt.show()        
+        Qopt = pb.compute_eoq()
+        print(Qopt)
+        print(pb.relevant_cost(Qopt))
 
 if __name__ == '__main__':
     #eoq._plot_eoq()
-    eoq._plot_sawtooth()
+    eoq._plot_sensitivity_to_Q()
+    #eoq._sample_instance()
+
