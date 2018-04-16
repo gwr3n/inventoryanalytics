@@ -7,7 +7,7 @@ MIT License
   
 Copyright (c) 2018 Roberto Rossi
 '''
-
+import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
@@ -116,7 +116,8 @@ class eoq:
     def coverage(self) -> float:
         """
         Compute the number of periods of demand the 
-        Economic Order Quantity will satisfy.
+        Economic Order Quantity will satisfy 
+        (i.e. the replenishment cycle length).
         
         Returns:
             float -- the number of periods of demand the 
@@ -200,9 +201,10 @@ class eoq:
     def _plot_sensitivity_to_Q():
         instance = {"K": 100, "h": 1, "d": 10, "v": 2}
         pb = eoq(**instance)
-        plt.plot([k for k in range(20,80)], [pb.sensitivity_to_Q(k) for k in range(20,80)])
+        QOpt = int(np.round(pb.compute_eoq()))
+        plt.plot([k for k in range(20-QOpt,80-QOpt)], [pb.sensitivity_to_Q(k) for k in range(20,80)])
         plt.ylabel('Sensitivity')
-        plt.xlabel('Q')
+        plt.xlabel('Difference between Q and Q*')
         plt.show() 
 
     @staticmethod
