@@ -178,6 +178,44 @@ class eoq:
 
         d = self.d
         return d*lead_time
+    
+    def opt_powersoftwo_policy(self, T: float) -> float:
+        K, d, h = self.K, self.d, self.h
+        rc = lambda t : K/t + h*d*t/2
+        k = 0
+        while rc(T*2**(k+1)) < rc(T*2**k):
+            k += 1
+        return T*2**k
+
+    def sensitivity_to_K(self, K: float) -> float:
+        """
+        Computes the additional cost faced if the 
+        esstimated K deviates from the actual one.
+        
+        Arguments:
+            K {float} -- the estimated K
+        
+        Returns:
+            float -- a ratio indicating the percent 
+                increase, e.g. 1.05 is a 5% increase
+        """
+        e = lambda x : x + 1/x
+        return 0.5*(e(np.sqrt(K/self.K)))
+
+    def sensitivity_to_h(self, h: float) -> float:
+        """
+        Computes the additional cost faced if the 
+        esstimated h deviates from the actual one.
+        
+        Arguments:
+            h {float} -- the estimated h
+        
+        Returns:
+            float -- a ratio indicating the percent 
+                increase, e.g. 1.05 is a 5% increase
+        """
+        e = lambda x : x + 1/x
+        return 0.5*(e(np.sqrt(self.h/h)))
 
     @staticmethod
     def _plot_eoq():
@@ -206,17 +244,40 @@ class eoq:
         plt.ylabel('Sensitivity')
         plt.xlabel('Difference between Q and Q*')
         plt.show() 
+    
+    @staticmethod
+    def _plot_sensitivity_to_K():
+        instance = {"K": 100, "h": 1, "d": 10, "v": 2}
+        pb = eoq(**instance)
+        plt.plot([k for k in range(60-pb.K,140-pb.K)], [pb.sensitivity_to_K(k) for k in range(60,140)])
+        plt.ylabel('Sensitivity')
+        plt.xlabel('Difference between K\' and K')
+        plt.show() 
+
+    @staticmethod
+    def _plot_sensitivity_to_h():
+        instance = {"K": 100, "h": 1, "d": 10, "v": 2}
+        pb = eoq(**instance)
+        plt.plot([k*0.1-pb.h for k in range(1,30)], [pb.sensitivity_to_h(k*0.1) for k in range(1,30)])
+        plt.ylabel('Sensitivity')
+        plt.xlabel('Difference between h\' and h')
+        plt.show() 
 
     @staticmethod
     def _sample_instance():
         instance = {"K": 100, "h": 1, "d": 10, "v": 2}
-        pb = eoq(**instance)
-        Qopt = pb.compute_eoq()
+        pb1 = eoq(**instance)
+        Qopt = pb1.compute_eoq()
         print(Qopt)
-        print(pb.relevant_cost(Qopt))
+        print(pb1.relevant_cost(Qopt))
+        instance = {"K": 60, "h": 1, "d": 10, "v": 2}
+        pb2 = eoq(**instance)
+        Qopt = pb2.compute_eoq()
+        print(pb1.relevant_cost(Qopt))
 
 if __name__ == '__main__':
     #eoq._plot_eoq()
-    eoq._plot_sensitivity_to_Q()
+    #eoq._plot_sensitivity_to_Q()
+    #eoq._plot_sensitivity_to_K()
+    eoq._plot_sensitivity_to_h()
     #eoq._sample_instance()
-

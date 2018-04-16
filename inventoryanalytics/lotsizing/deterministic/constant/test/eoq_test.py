@@ -49,5 +49,9 @@ class TestEOQ(unittest.TestCase):
         d, v = self.eoq.d, self.eoq.v
         self.assertAlmostEquals(self.eoq.sensitivity_to_Q(Q), (self.eoq.cost(Q)-d*v)/(self.eoq.cost(Qopt)-d*v), places=2)
 
+    def test_reorder_point(self):
+        L = 1/12
+        self.assertAlmostEquals(self.eoq.reorder_point(L), 200, places=2)
+
     def test_coverage(self):
         self.assertAlmostEqual(self.eoq.coverage(), 1.26/12, places=2)
