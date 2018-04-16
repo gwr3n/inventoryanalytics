@@ -55,3 +55,21 @@ class TestEOQ(unittest.TestCase):
 
     def test_coverage(self):
         self.assertAlmostEqual(self.eoq.coverage(), 1.26/12, places=2)
+
+class TestEOQ_all_units_discounts(unittest.TestCase):
+
+    def setUp(self):
+        instance = {"K": 3.2, "h": 0.24, "d": 2400, "v": 0.4}
+        self.eoq = eoq.eoq(**instance)
+
+    def tearDown(self):
+        pass
+
+class TestEOQ_incremental_discounts(unittest.TestCase):
+
+    def setUp(self):
+        instance = {"K": 3.2, "h": 0.24, "d": 2400, "v": 0.4}
+        self.eoq = eoq.eoq(**instance)
+
+    def tearDown(self):
+        pass

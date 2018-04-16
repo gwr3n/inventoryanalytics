@@ -275,6 +275,18 @@ class eoq:
         Qopt = pb2.compute_eoq()
         print(pb1.relevant_cost(Qopt))
 
+class eoq_all_units_discounts:
+    pass
+
+class eoq_incremental_discounts:
+    pass
+
+class epq:
+    pass
+
+class eoq_planned_backorders:
+    pass
+
 if __name__ == '__main__':
     #eoq._plot_eoq()
     #eoq._plot_sensitivity_to_Q()
