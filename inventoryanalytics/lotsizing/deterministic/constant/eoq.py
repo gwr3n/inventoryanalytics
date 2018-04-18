@@ -7,6 +7,7 @@ MIT License
   
 Copyright (c) 2018 Roberto Rossi
 '''
+from typing import List
 import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
@@ -275,11 +276,53 @@ class eoq:
         Qopt = pb2.compute_eoq()
         print(pb1.relevant_cost(Qopt))
 
-class eoq_all_units_discounts:
-    pass
+class eoq_discounts:
+    def __init__(self, K: float, h: float, d: float, b: List[float], v: List[float]):
+        """
+        Constructs an instance of the Economic Order Quantity problem.
+        
+        Arguments:
+            K {float} -- the fixed ordering cost
+            h {float} -- the proportional holding cost
+            d {float} -- the demand per period
+            b {float} -- a list of puchasing cost breakpoints
+            v {float} -- a list of decreasing unit purchasing costs
+        """
 
-class eoq_incremental_discounts:
-    pass
+        self.K, self.h, self.d, self.b, self.v = K, h, d, b, v
+        self.b.insert(0, 0)
+        self.b.append(float("inf"))
+        
+class eoq_all_units_discounts(eoq_discounts):
+
+    def c(self, Q):
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j] ,range(1,len(self.b)))).pop()
+        return self.v[j-1]*Q
+    
+    @staticmethod
+    def _print_cost():
+        maxQ = 50
+        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [10,5,3,1]}
+        pb = eoq_all_units_discounts(**instance)
+        for j in range(1, len(pb.v)+1):
+            plt.plot([k for k in range(pb.b[j-1],min(pb.b[j],maxQ))], [pb.c(k) for k in range(pb.b[j-1],min(pb.b[j],maxQ))])
+        plt.ylabel('Purchase cost')
+        plt.xlabel('Q')
+        plt.show() 
+
+class eoq_incremental_discounts(eoq_discounts):
+    def c(self, Q):
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j] ,range(1,len(self.b)))).pop()
+        return sum([(self.b[k]-self.b[k-1])*self.v[k-1] for k in range(1,j)])+(Q-self.b[j-1])*self.v[j-1]
+
+    @staticmethod
+    def _print_cost():
+        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [10,5,3,1]}
+        pb = eoq_incremental_discounts(**instance)
+        plt.plot([k for k in range(0,50)], [pb.c(k) for k in range(0,50)])
+        plt.ylabel('Purchase cost')
+        plt.xlabel('Q')
+        plt.show() 
 
 class eoq_planned_backorders:
     def __init__(self, K: float, h: float, d: float, v: float, p: float):
@@ -516,4 +559,6 @@ if __name__ == '__main__':
     #eoq._plot_sensitivity_to_h()
     #eoq._sample_instance()
     #eoq_planned_backorders._sample_instance()
-    epq._sample_instance()
+    #epq._sample_instance()
+    eoq_all_units_discounts._print_cost()
+    #eoq_incremental_discounts._print_cost()
