@@ -9,7 +9,6 @@ Copyright (c) 2018 Roberto Rossi
 '''
 
 from typing import List
-import numpy as np
 import networkx as nx
 import itertools
 
@@ -53,6 +52,7 @@ class WagnerWhitin:
         path[len(path)-1] += 1
         for t in range(1,len(path)):
             cost += self.cycle_cost(path[t-1],path[t]-1)
+            print(self.cycle_cost(path[t-1],path[t]-1))
         return cost
 
     def order_quantities(self) -> List[float]:
