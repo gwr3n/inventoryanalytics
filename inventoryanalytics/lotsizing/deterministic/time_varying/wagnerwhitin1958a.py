@@ -54,7 +54,7 @@ class WagnerWhitin:
         Compute the cost of an optimal solution to the Wagner-Whitin problem
         '''
         T, cost = len(self.d), 0
-        s, p = T, self.predecessors[T-1]
+        p, s = self.predecessors[T-1], T
         while p > 0: 
             cost += self.cost_matrix[p][s-1]
             s, p = p, self.predecessors[p]
@@ -65,7 +65,7 @@ class WagnerWhitin:
         Compute optimal Wagner-Whitin order quantities
         '''
         T = len(self.d)
-        s, p = T, self.predecessors[T-1]
+        p, s = self.predecessors[T-1], T
         qty = [0 for k in range(0,T)]
         while p > 0: 
             qty[p] = sum([self.d[k] for k in range(p,s)])
