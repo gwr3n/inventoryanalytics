@@ -353,7 +353,6 @@ class eoq_all_units_discounts(eoq_discounts):
     @staticmethod
     def _print_total_cost():
         instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
-        #instance = {"K": 8, "h": 0.3, "d": 1300, "b": [400,800], "v": [0.75,0.72,0.68]}
         pb = eoq_all_units_discounts(**instance)
         Q = pb.compute_eoq()
         print(Q)
@@ -391,7 +390,6 @@ class eoq_incremental_discounts(eoq_discounts):
     @staticmethod
     def _print_total_cost():
         instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
-        #instance = {"K": 8, "h": 0.3, "d": 1300, "b": [400,800], "v": [0.75,0.72,0.68]}
         pb = eoq_incremental_discounts(**instance)
         Q = pb.compute_eoq()
         print(Q)
@@ -635,6 +633,6 @@ if __name__ == '__main__':
     #eoq_planned_backorders._sample_instance()
     #epq._sample_instance()
     #eoq_all_units_discounts._print_unit_cost()
-    eoq_all_units_discounts._print_total_cost()
+    #eoq_all_units_discounts._print_total_cost()
     #eoq_incremental_discounts._print_unit_cost()
-    #eoq_incremental_discounts._print_total_cost()
+    eoq_incremental_discounts._print_total_cost()
