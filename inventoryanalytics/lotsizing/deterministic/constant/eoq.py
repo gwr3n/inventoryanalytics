@@ -92,9 +92,6 @@ class eoq:
         """
         Computes the variable ordering cost
         
-        Arguments:
-            Q {float} -- the order quantity
-        
         Returns:
             float -- the variable ordering cost
         """        
@@ -191,7 +188,7 @@ class eoq:
     def sensitivity_to_K(self, K: float) -> float:
         """
         Computes the additional cost faced if the 
-        esstimated K deviates from the actual one.
+        estimated K deviates from the actual one.
         
         Arguments:
             K {float} -- the estimated K
@@ -276,53 +273,130 @@ class eoq:
         Qopt = pb2.compute_eoq()
         print(pb1.relevant_cost(Qopt))
 
-class eoq_discounts:
+class eoq_discounts(eoq):
     def __init__(self, K: float, h: float, d: float, b: List[float], v: List[float]):
         """
         Constructs an instance of the Economic Order Quantity problem.
         
         Arguments:
             K {float} -- the fixed ordering cost
-            h {float} -- the proportional holding cost
+            h {float} -- the proportional holding cost as a percentage of purchase cost
             d {float} -- the demand per period
             b {float} -- a list of puchasing cost breakpoints
-            v {float} -- a list of decreasing unit purchasing costs
+            v {float} -- a list of decreasing unit purchasing costs where v[j] applies in (b[j],b[j-1])
         """
 
         self.K, self.h, self.d, self.b, self.v = K, h, d, b, v
         self.b.insert(0, 0)
         self.b.append(float("inf"))
+
+    def compute_eoq(self) -> float:
+        """
+        Computes the Economic Order Quantity.
+        
+        Returns:
+            float -- the Economic Order Quantity
+        """
+
+        quantities = [minimize(self.cost, 
+                               self.b[j-1]+1, 
+                               bounds=((self.b[j-1],self.b[j]),), 
+                               method='SLSQP', 
+                               options={'ftol': 1e-8, 'disp': False}).x[0]
+                      for j in range(1, len(self.b))]
+        costs = [self.cost(k) for k in quantities]
+        return quantities[costs.index(min(costs))]
+
+    @staticmethod
+    def _print_unit_cost(pb):
+        maxQ = 50
+        minQ = 1
+        for j in range(1, len(pb.v)+1):
+            plt.plot([k for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))], [pb.unit_cost(k) for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))])
+        plt.ylabel('Per unit purchasing cost')
+        plt.xlabel('Q')
+        plt.show() 
+
+    @staticmethod
+    def _print_total_cost(pb):
+        maxQ = 50
+        minQ = 10
+        for j in range(1, len(pb.v)+1):
+            plt.plot([k for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))], [pb.cost(k) for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))])
+        plt.ylabel('Total cost')
+        plt.xlabel('Q')
+        plt.show() 
         
 class eoq_all_units_discounts(eoq_discounts):
-
-    def c(self, Q):
-        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j] ,range(1,len(self.b)))).pop()
+    def unit_cost(self, Q):
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j], 
+                       range(1,len(self.b)))).pop()
         return self.v[j-1]*Q
+
+    def co_variable(self, Q):
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j], 
+                       range(1,len(self.b)))).pop()
+        return self.v[j-1]*self.d
+
+    def ch(self, Q: float) -> float:
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j], 
+                       range(1,len(self.b)))).pop()
+        h = self.h*self.v[j-1]
+        return h*Q/2
+
+    @staticmethod
+    def _print_unit_cost():
+        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
+        pb = eoq_all_units_discounts(**instance)
+        eoq_discounts._print_unit_cost(pb)
     
     @staticmethod
-    def _print_cost():
-        maxQ = 50
-        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [10,5,3,1]}
+    def _print_total_cost():
+        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
+        #instance = {"K": 8, "h": 0.3, "d": 1300, "b": [400,800], "v": [0.75,0.72,0.68]}
         pb = eoq_all_units_discounts(**instance)
-        for j in range(1, len(pb.v)+1):
-            plt.plot([k for k in range(pb.b[j-1],min(pb.b[j],maxQ))], [pb.c(k) for k in range(pb.b[j-1],min(pb.b[j],maxQ))])
-        plt.ylabel('Purchase cost')
-        plt.xlabel('Q')
-        plt.show() 
+        Q = pb.compute_eoq()
+        print(Q)
+        print(pb.cost(Q))
+        eoq_discounts._print_total_cost(pb)
 
 class eoq_incremental_discounts(eoq_discounts):
-    def c(self, Q):
-        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j] ,range(1,len(self.b)))).pop()
-        return sum([(self.b[k]-self.b[k-1])*self.v[k-1] for k in range(1,j)])+(Q-self.b[j-1])*self.v[j-1]
+    def unit_cost(self, Q):
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j],
+                       range(1,len(self.b)))).pop()
+        return sum([(self.b[k]-self.b[k-1])*self.v[k-1] 
+                    for k in range(1,j)])+(Q-self.b[j-1])*self.v[j-1]
+
+    def co_variable(self, Q):
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j],
+                       range(1,len(self.b)))).pop()
+        cQ = sum([(self.b[k]-self.b[k-1])*self.v[k-1] 
+                  for k in range(1,j)])+(Q-self.b[j-1])*self.v[j-1]
+        return self.d*cQ/Q
+    
+    def ch(self, Q: float) -> float:
+        j = set(filter(lambda j: self.b[j-1] <= Q < self.b[j],
+                       range(1,len(self.b)))).pop()
+        cQ = sum([(self.b[k]-self.b[k-1])*self.v[k-1] 
+                  for k in range(1,j)])+(Q-self.b[j-1])*self.v[j-1]
+        h = self.h*cQ/Q
+        return h*Q/2
 
     @staticmethod
-    def _print_cost():
-        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [10,5,3,1]}
+    def _print_unit_cost():
+        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
         pb = eoq_incremental_discounts(**instance)
-        plt.plot([k for k in range(0,50)], [pb.c(k) for k in range(0,50)])
-        plt.ylabel('Purchase cost')
-        plt.xlabel('Q')
-        plt.show() 
+        eoq_discounts._print_unit_cost(pb)
+    
+    @staticmethod
+    def _print_total_cost():
+        instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
+        #instance = {"K": 8, "h": 0.3, "d": 1300, "b": [400,800], "v": [0.75,0.72,0.68]}
+        pb = eoq_incremental_discounts(**instance)
+        Q = pb.compute_eoq()
+        print(Q)
+        print(pb.cost(Q))
+        eoq_discounts._print_total_cost(pb)
 
 class eoq_planned_backorders:
     def __init__(self, K: float, h: float, d: float, v: float, p: float):
@@ -560,5 +634,7 @@ if __name__ == '__main__':
     #eoq._sample_instance()
     #eoq_planned_backorders._sample_instance()
     #epq._sample_instance()
-    eoq_all_units_discounts._print_cost()
-    #eoq_incremental_discounts._print_cost()
+    #eoq_all_units_discounts._print_unit_cost()
+    eoq_all_units_discounts._print_total_cost()
+    #eoq_incremental_discounts._print_unit_cost()
+    #eoq_incremental_discounts._print_total_cost()
