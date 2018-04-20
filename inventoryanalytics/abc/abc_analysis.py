@@ -7,13 +7,50 @@ class abc:
     def __init__(self):
         self.data = abc.readData('./inventoryanalytics/abc/data/Flores1992.csv')
 
-    def annual_dollar_usage(self):
-        data_adu = abc.compute_adu(self.data)
-        print(np.matrix(data_adu))
+    @staticmethod
+    def annual_dollar_usage_instance():
+        # prepare data
+        d = abc()
+        m = np.matrix(d.data)[1:,[1,2]].astype(np.float)
 
-    def ahp_weighted(self):
-        data_ahp = abc.compute_ahp(self.data)
-        print(np.matrix(data_ahp))
+        # compute ADU
+        adu = d.annual_dollar_usage(m)
+        
+        # verify ABC
+        for k in range(0,len(adu)):
+            adu[k].append(d.data[k+1][8])
+
+        adu = sorted(adu,key=lambda x: x[3], reverse=True)
+        print(np.matrix(adu))
+
+    def annual_dollar_usage(self, m):
+        # compute adu
+        data = [[self.data[k+1][0],m[k,0],m[k,1],m[k,0]*m[k,1]] for k in range(0,len(m))]
+        return data
+
+    @staticmethod
+    def ahp_weighted_instance():
+        # prepare data
+        d = abc()
+        m = np.matrix(d.data)[1:,[2,3,6,7]].astype(np.float)
+        w = [0.078,0.092,0.42,0.41] #average unit cost, annual dollar usage, criticality, lead time
+
+        # compute AHP
+        ahp = d.ahp_weighted(m, w)
+
+        # verify ABC
+        for k in range(0,len(ahp)):
+            ahp[k].append(d.data[k+1][8])
+
+        ahp = sorted(ahp,key=lambda x: x[1], reverse=True)
+        print(np.matrix(ahp))
+
+    def ahp_weighted(self, m, w: List[float]):
+        # compute ahp
+        fmin, fmax = m.min(0), m.max(0)
+        norm = lambda i, v : w[i]*(v-fmin[0,i])/(fmax[0,i]-fmin[0,i])
+        data = [[self.data[k+1][0],sum(norm(i, m[k,i]) for i in range(0,4))] for k in range(1,len(m))]
+        return data
 
     def dea(self):
         pass
@@ -28,42 +65,9 @@ class abc:
                 d.append(row)
         return d
 
-    @staticmethod
-    def compute_adu(d):
-        data = []
-        for k in range(1,len(d)):
-            try:
-                adu = float(d[k][1])*float(d[k][2])
-            except ValueError:
-                pass
-            data.append([d[k][0],d[k][1],d[k][2],adu])
-        return sorted(data,key=lambda x: x[3], reverse=True)
-
-    @staticmethod
-    def compute_ahp(d):
-        data = []
-        weights = [0.078,0.092,0.42,0.41] #average unit cost, annual dollar usage, criticality, lead time
-        matrix = np.matrix(d)
-        data = matrix[1:,[2,3,6,7]].astype(np.float)
-        fmax = data.max(0)
-        print(fmax)
-        fmin = data.min(0)
-        print(fmin)
-        out = []
-        for k in range(1,len(d)-1):
-            try:
-                out.append([d[k+1][0],
-                            weights[0]*(data[k,0]-fmin[0,0])/(fmax[0,0]-fmin[0,0])+
-                            weights[1]*(data[k,1]-fmin[0,1])/(fmax[0,1]-fmin[0,1])+
-                            weights[2]*(data[k,2]-fmin[0,2])/(fmax[0,2]-fmin[0,2])+
-                            weights[3]*(data[k,3]-fmin[0,3])/(fmax[0,3]-fmin[0,3]),d[k+1][8]])
-            except ValueError:
-                pass
-        return sorted(out,key=lambda x: x[1], reverse=True)
-
 if __name__ == '__main__':
     d = abc()
-    #d.annual_dollar_usage()
-    d.ahp_weighted()
+    #d.annual_dollar_usage_instance()
+    d.ahp_weighted_instance()
     
     
