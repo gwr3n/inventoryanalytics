@@ -11,13 +11,24 @@ class abc:
 
     @staticmethod
     def annotate_ABC(m):
-        # annotate matrix with ABC
+        """
+        Annotate matrix with ABC
+        
+        Arguments:
+            m -- the matrix
+        
+        Returns:
+            the annotated matrix
+        """
+
+        proportion = lambda p, k: k/len(m) < p
+        class_breakpoints = {'A': 0.2, 'B': 0.5, 'C': 1}
         for k in range(0,len(m)):
-            if 1.0*k/len(m) < 0.2:
-                m[k].append('A')
-            elif 1.0*k/len(m) < 0.5:
+            if proportion(class_breakpoints['A'],k):
+                m[k].append('A') 
+            elif proportion(class_breakpoints['B'],k): 
                 m[k].append('B')
-            else:
+            else: 
                 m[k].append('C')
         return m
 
@@ -145,9 +156,9 @@ class abc:
 
 if __name__ == '__main__':
     d = abc()
-    #d.annual_dollar_usage_instance()
+    d.annual_dollar_usage_instance()
     #d.ahp_weighted_instance()
     #d.dea_instance()
-    d.abc_scatter()
+    #d.abc_scatter()
     
     
