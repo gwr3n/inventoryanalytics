@@ -36,10 +36,11 @@ class abc:
     def annual_dollar_usage_instance():
         # prepare data
         d = abc()
-        m = np.matrix(d.data)[1:,[1,2]].astype(np.float)
+        item_no = np.matrix(d.data)[1:,0]                #item ids
+        m = np.matrix(d.data)[1:,[1,2]].astype(np.float) #criteria scores
 
         # compute ADU
-        adu = d.annual_dollar_usage(m)
+        adu = d.annual_dollar_usage(item_no, m)
         
         # append ADU classes
         for k in range(0,len(adu)):
@@ -52,9 +53,9 @@ class abc:
 
         print(np.matrix(adu))
 
-    def annual_dollar_usage(self, m):
+    def annual_dollar_usage(self, item_no, m):
         # compute adu
-        data = [[self.data[k+1][0],m[k,0],m[k,1],m[k,0]*m[k,1]] for k in range(0,len(m))]
+        data = [[item_no[k,0],m[k,0],m[k,1],m[k,0]*m[k,1]] for k in range(0,len(m))]
         return data
 
     @staticmethod
@@ -131,7 +132,7 @@ class abc:
         x, y = 2, 7 #1,2,6,7
         m = np.matrix(d.data)[1:,[x,y]].astype(np.float)
         my_colors = {'A':'red','B':'yellow','C':'green'}
-        for k in range(0,len(d.data)-1):
+        for k in range(0,m.shape[0]-1):
             plt.scatter(m[:,0].flatten().tolist()[0][k],
                         m[:,1].flatten().tolist()[0][k],
                         color = my_colors.get(np.matrix(d.data)[1:,8].flatten().tolist()[0][k]))
