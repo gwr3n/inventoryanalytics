@@ -1,0 +1,7 @@
+﻿,Total Annual Usage,Average Unit Cost ($),Annual Dollar Usage ($),Cum. Annual Dollar Usage ($),Cum. Annual % Usage,Criticality factor,Lead time,ABC classification
+s2,27,210,5670,11510.64,22.3,1,5,A
+s6,94,31.24,2936.67,27732.68,53.7,0.5,3,C
+s13,12,86.5,1038,41180.4,79.7,1,7,B
+s31,3,72,216,49880.08,96.5,0.5,5,B
+s32,4,53.02,212.08,50092.16,96.9,1,2,A
+s34,27,7.07,190.89,50480.97,97.7,0.01,7,A
