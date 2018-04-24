@@ -300,12 +300,19 @@ class abc:
         return d
 
 if __name__ == '__main__':
-    #abc.annual_dollar_usage_instance()
-    #abc.ahp_instance()
-    #scaled = False
-    #abc.dea_instance(scaled)
-    #abc.k_nn_example()
-    #abc.k_nn()
-    abc.pca()
+    abc_strategy = 'ADU'
+
+    if abc_strategy == 'ADU':
+        abc.annual_dollar_usage_instance()
+    elif abc_strategy == 'AHP':
+        abc.ahp_instance()
+    elif abc_strategy == 'DEA':
+        scaled = False
+        abc.dea_instance(scaled)
+    elif abc_strategy == 'kNN':
+        #abc.k_nn_example()
+        abc.k_nn()
+    elif abc_strategy == 'PCA':
+        abc.pca()
     
     
