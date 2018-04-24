@@ -15,6 +15,8 @@ import sys
 
 sys.path.insert(0,'/Applications/CPLEX_Studio128/cplex/python/3.6/x86-64_osx')
 
+# http://ibmdecisionoptimization.github.io/docplex-doc/mp/creating_model.html
+
 class WagnerWhitin:
     '''
     A Wagner-Whitin problem.
