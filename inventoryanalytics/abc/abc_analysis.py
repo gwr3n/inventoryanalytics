@@ -1,3 +1,13 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 import csv
 import numpy as np
 from typing import List

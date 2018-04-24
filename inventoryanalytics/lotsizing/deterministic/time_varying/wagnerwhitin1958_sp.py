@@ -9,8 +9,8 @@ Copyright (c) 2018 Roberto Rossi
 '''
 
 from typing import List
-from scipy.sparse.csgraph import shortest_path as sp
-import numpy as np
+import networkx as nx
+import itertools
 
 class WagnerWhitin:
     '''
@@ -30,10 +30,11 @@ class WagnerWhitin:
         d: the demand in each period.
         '''
         self.K, self.h, self.d = K, h, d
-        self.cost_matrix = sp(np.array(self.cycle_cost_matrix()))
-        self.predecessors = sp(np.array(self.cycle_cost_matrix()),
-                                        return_predecessors=True)[1][0,:]
-    
+        self.graph = nx.DiGraph()
+        for i in range(0, len(self.d)):
+            for j in range(i, len(self.d)):
+                self.graph.add_edge(i, j, weight=self.cycle_cost(i, j))
+
     def cycle_cost(self, i: int, j: int) -> float:
         '''
         Compute the cost of a replenishment cycle covering periods i,...,j
@@ -42,35 +43,28 @@ class WagnerWhitin:
                self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) \
                if i<=j else 0
 
-    def cycle_cost_matrix(self) -> List[float]:
-        '''
-        Compute a matrix with the cost of every possible replenishment cycle
-        '''
-        T = len(self.d)
-        return [[self.cycle_cost(i,j) for j in range(0,T)] for i in range(0,T)]
-
     def optimal_cost(self) -> float:
         '''
         Compute the cost of an optimal solution to the Wagner-Whitin problem
         '''
-        T, cost = len(self.d), 0
-        p, s = self.predecessors[T-1], T
-        while p > 0: 
-            cost += self.cost_matrix[p][s-1]
-            s, p = p, self.predecessors[p]
-        return cost + self.cost_matrix[p][s-1]
+        T, cost, g = len(self.d), 0, self.graph
+        path = nx.dijkstra_path(g, 0, T-1)
+        path.append(len(self.d))
+        for t in range(1,len(path)):
+            cost += self.cycle_cost(path[t-1],path[t]-1)
+            print(self.cycle_cost(path[t-1],path[t]-1))
+        return cost
 
     def order_quantities(self) -> List[float]:
         '''
         Compute optimal Wagner-Whitin order quantities
         '''
-        T = len(self.d)
-        p, s = self.predecessors[T-1], T
+        T, g = len(self.d), self.graph
+        path = nx.dijkstra_path(g, 0, T-1)
+        path.append(len(self.d))
         qty = [0 for k in range(0,T)]
-        while p > 0: 
-            qty[p] = sum([self.d[k] for k in range(p,s)])
-            s, p = p, self.predecessors[p]
-        qty[0] = sum([self.d[k] for k in range(0,s)])
+        for t in range(1,len(path)):
+            qty[path[t-1]] = sum([self.d[k] for k in range(path[t-1],path[t])])
         return qty
 
 if __name__ == '__main__':
