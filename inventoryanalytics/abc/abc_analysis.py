@@ -100,8 +100,15 @@ class abc:
         item_no = np.matrix(data)[1:,0]                     #item ids
         m = np.matrix(data)[1:,[1,2,6,7]].astype(np.float)  #criteria scores
 
+        #pairwise preferences for average unit cost, annual dollar usage, criticality, lead time
+        prefs = [
+            [1,1,1/8,1/4],
+            [1,1,1/3,1/6],
+            [8,3,1,1],
+            [4,6,1,1]]
+        L, Q = np.linalg.eig(prefs)
         #weights for average unit cost, annual dollar usage, criticality, lead time
-        w = [0.078,0.092,0.42,0.41] 
+        w = np.real(np.transpose(Q)[0]/sum(np.transpose(Q)[0])) # [0.078,0.092,0.42,0.41] 
 
         # compute AHP
         fmin, fmax = m.min(0), m.max(0)
@@ -310,7 +317,7 @@ class abc:
         return d
 
 if __name__ == '__main__':
-    abc_strategy = 'ADU'
+    abc_strategy = 'AHP'
 
     if abc_strategy == 'ADU':
         abc.annual_dollar_usage_instance()
