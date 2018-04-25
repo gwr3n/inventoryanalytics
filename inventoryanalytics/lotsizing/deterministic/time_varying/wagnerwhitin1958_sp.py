@@ -13,22 +13,23 @@ import networkx as nx
 import itertools
 
 class WagnerWhitin:
-    '''
+    """
     A Wagner-Whitin problem.
 
     H.M. Wagner and T. Whitin, 
     "Dynamic version of the economic lot size model," 
     Management Science, Vol. 5, pp. 89–96, 1958
-    '''
+    """
 
     def __init__(self, K: float, h: float, d: List[float]):
-        '''
+        """
         Create an instance of a Wagner-Whitin problem.
 
-        K: the fixed ordering cost;
-        h: the per unit holding cost;
-        d: the demand in each period.
-        '''
+        Arguments:
+            K {float} -- the fixed ordering cost
+            h {float} -- the per unit holding cost
+            d {List[float]} -- the demand in each period
+        """
         self.K, self.h, self.d = K, h, d
         self.graph = nx.DiGraph()
         for i in range(0, len(self.d)):

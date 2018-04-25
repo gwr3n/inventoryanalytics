@@ -13,31 +13,34 @@ import numpy as np
 from typing import List
 from scipy.optimize import linprog
 import matplotlib.pyplot as plt
+import codecs
 
 from sklearn.model_selection import train_test_split 
 from sklearn.preprocessing import StandardScaler 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, confusion_matrix    
 
-class abc:
+class ABC:
 
     def __init__(self, file='./inventoryanalytics/abc/data/Flores1992.csv'):
-        self.data = abc.readData(file)
+        self.data = ABC.readData(file)
 
     @staticmethod
-    def annotate_ABC(m):
+    def annotate_ABC(m, class_breakpoints: dict = {'A': 0.2, 'B': 0.5, 'C': 1}):
         """
         Annotate matrix with ABC
         
         Arguments:
-            m -- the matrix
+            m {[type]} -- matrix
+        
+        Keyword Arguments:
+            class_breakpoints {dict} -- class proportion breakpoints (default: {{'A': 0.2, 'B': 0.5, 'C': 1}})
         
         Returns:
-            the annotated matrix
+            [type] -- the annotated matrix
         """
 
         proportion = lambda p, k: k/len(m) < p
-        class_breakpoints = {'A': 0.2, 'B': 0.5, 'C': 1}
         for k in range(0,len(m)):
             if proportion(class_breakpoints['A'],k):
                 m[k].append('A') 
@@ -50,7 +53,7 @@ class abc:
     @staticmethod
     def annual_dollar_usage_instance():
         # prepare data
-        d = abc()
+        d = ABC()
         data = d.data
         '''
         TAU -- Total Annual Usage
@@ -72,29 +75,32 @@ class abc:
         item_no = np.matrix(data)[1:,0]                #item ids
         m = np.matrix(data)[1:,[1,2]].astype(np.float) #criteria scores
 
+        unsorted_adu = ABC.annual_dollar_usage(item_no, m)
+        print(np.matrix(unsorted_adu))
+        
+        x, y = 1, 2 #1,2,6,7
+        ABC.abc_scatter_labels([row[2] for row in unsorted_adu], x, y)
+
+    @staticmethod
+    def annual_dollar_usage(item_no, m):
         # compute ADU
         adu = [[item_no[k,0],m[k,0]*m[k,1]] for k in range(0,len(m))]
         
         # append ADU classes
-        for k in range(0,len(adu)):
-            adu[k].append(data[k+1][8])
+        #for k in range(0,len(adu)):
+        #    adu[k].append(data[k+1][8])
 
         adu = sorted(adu,key=lambda x: x[1], reverse=True)
 
         # annotate ABC
-        abc.annotate_ABC(adu)
+        ABC.annotate_ABC(adu)
 
-        unsorted_adu = sorted(adu,key=lambda x: int(x[0][1:]), reverse=False)
-
-        print(np.matrix(unsorted_adu))
-        
-        x, y = 1, 2 #1,2,6,7
-        abc.abc_scatter_labels([row[3] for row in unsorted_adu], x, y)
+        return sorted(adu,key=lambda x: int(x[0][1:]), reverse=False)
 
     @staticmethod
     def ahp_instance():
         # prepare data
-        d = abc()
+        d = ABC()
         data = d.data
 
         item_no = np.matrix(data)[1:,0]                     #item ids
@@ -122,19 +128,19 @@ class abc:
         ahp = sorted(ahp,key=lambda x: x[1], reverse=True)
 
         # annotate ABC
-        abc.annotate_ABC(ahp)
+        ABC.annotate_ABC(ahp)
 
         unsorted_ahp = sorted(ahp,key=lambda x: int(x[0][1:]), reverse=False)
 
         print(np.matrix(unsorted_ahp))
         
         x, y = 1, 2 #1,2,6,7
-        abc.abc_scatter_labels([row[3] for row in unsorted_ahp], x, y)
+        ABC.abc_scatter_labels([row[3] for row in unsorted_ahp], x, y)
 
     @staticmethod
     def dea_instance(scaled: bool):
         # prepare data
-        d = abc()
+        d = ABC()
         data = d.data
 
         item_no = np.matrix(data)[1:,0]                       #item ids
@@ -157,20 +163,20 @@ class abc:
         dea = sorted(dea,key=lambda x: x[1], reverse=True)
 
         # annotate ABC
-        abc.annotate_ABC(dea)
+        ABC.annotate_ABC(dea)
 
         unsorted_dea = sorted(dea,key=lambda x: int(x[0][1:]), reverse=False)
 
         print(np.matrix(unsorted_dea))
         
         x, y = 1, 2 #1,2,6,7
-        abc.abc_scatter_labels([row[3] for row in unsorted_dea], x, y)
+        ABC.abc_scatter_labels([row[3] for row in unsorted_dea], x, y)
 
     @staticmethod
     def k_nn_example():
 
         # prepare data
-        d = abc('./inventoryanalytics/abc/data/training_knn.csv')
+        d = ABC('./inventoryanalytics/abc/data/training_knn.csv')
         data = d.data
 
         X = np.matrix(data)[1:,[1,2]]
@@ -216,7 +222,7 @@ class abc:
         # http://stackabuse.com/k-nearest-neighbors-algorithm-in-python-and-scikit-learn/
 
         # prepare data
-        d = abc()
+        d = ABC()
         data = d.data
 
         item_no = np.matrix(data)[1:,0]                       #item ids
@@ -244,12 +250,12 @@ class abc:
         print(np.matrix(matrix))
         
         x, y = 1, 2 #1,2,6,7
-        abc.abc_scatter_labels(labels, x, y)
+        ABC.abc_scatter_labels(labels, x, y)
 
     @staticmethod
     def pca():
         # prepare data
-        d = abc()
+        d = ABC()
         data = d.data
 
         item_no = np.matrix(data)[1:,0]                     #item ids
@@ -276,19 +282,19 @@ class abc:
         pca = sorted(pca,key=lambda x: x[1], reverse=True)
 
         # annotate ABC
-        abc.annotate_ABC(pca)
+        ABC.annotate_ABC(pca)
 
-        unsorted_ahp = sorted(pca,key=lambda x: int(x[0][1:]), reverse=False)
+        unsorted_pca = sorted(pca,key=lambda x: int(x[0][1:]), reverse=False)
 
-        print(np.matrix(unsorted_ahp))
+        print(np.matrix(unsorted_pca))
         
         x, y = 1, 2 #1,2,6,7
-        abc.abc_scatter_labels([row[3] for row in unsorted_ahp], x, y)
+        ABC.abc_scatter_labels([row[3] for row in unsorted_pca], x, y)
 
     @staticmethod
     def abc_scatter_labels(labels, x, y):
         # prepare data
-        d = abc()
+        d = ABC()
         # print(np.matrix(d.data))
         # plot points and annotations
         m = np.matrix(d.data)[1:,[x,y]].astype(np.float)
@@ -310,26 +316,30 @@ class abc:
     @staticmethod
     def readData(file: str):
         d = []
-        with open(file) as csvfile:
-            readCSV = csv.reader(csvfile, delimiter=',')
-            for row in readCSV:
-                d.append(row)
-        return d
+        try:
+            with codecs.open(file, "r", "utf-8") as csvfile:
+                readCSV = csv.reader(csvfile, delimiter=',')
+                for row in readCSV:
+                    d.append(row)
+            return d
+        except IOError as e: 
+            print("Error: File does not appear to exist.")
+            raise e 
 
 if __name__ == '__main__':
-    abc_strategy = 'AHP'
+    abc_strategy = 'ADU'
 
     if abc_strategy == 'ADU':
-        abc.annual_dollar_usage_instance()
+        ABC.annual_dollar_usage_instance()
     elif abc_strategy == 'AHP':
-        abc.ahp_instance()
+        ABC.ahp_instance()
     elif abc_strategy == 'DEA':
         scaled = False
-        abc.dea_instance(scaled)
+        ABC.dea_instance(scaled)
     elif abc_strategy == 'kNN':
         #abc.k_nn_example()
-        abc.k_nn()
+        ABC.k_nn()
     elif abc_strategy == 'PCA':
-        abc.pca()
+        ABC.pca()
     
     
