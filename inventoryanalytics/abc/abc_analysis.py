@@ -106,9 +106,9 @@ class abc:
             [1,1,1/3,1/6],
             [8,3,1,1],
             [4,6,1,1]]
-        L, Q = np.linalg.eig(prefs)
+        v = np.linalg.eig(prefs)
         #weights for average unit cost, annual dollar usage, criticality, lead time
-        w = np.real(np.transpose(Q)[0]/sum(np.transpose(Q)[0])) # [0.078,0.092,0.42,0.41] 
+        w = np.real(np.transpose(v[1])[0]/sum(np.transpose(v[1])[0])) # [0.078,0.092,0.42,0.41] 
 
         # compute AHP
         fmin, fmax = m.min(0), m.max(0)
