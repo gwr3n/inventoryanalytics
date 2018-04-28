@@ -51,6 +51,28 @@ class ABC:
         return m
 
     @staticmethod
+    def annual_dollar_usage(item_no: np.matrix, m: np.matrix):
+        """
+        ABC analysis according to Annual Dollar Usage        
+
+        Arguments:
+            item_no {[type]} -- list of item numbers
+            m {[type]} -- ranking criteria
+        
+        Returns:
+            [type] -- a matrix of item ranked and classified according to Annual Dollar Usage
+        """
+
+        # compute ADU
+        adu = [[item_no[k,0],m[k,0]*m[k,1]] for k in range(0,len(m))]
+        adu = sorted(adu,key=lambda x: x[1], reverse=True)
+
+        # annotate ABC
+        ABC.annotate_ABC(adu)
+
+        return sorted(adu,key=lambda x: int(x[0][1:]), reverse=False)
+
+    @staticmethod
     def annual_dollar_usage_instance():
         # prepare data
         d = ABC()
@@ -82,20 +104,42 @@ class ABC:
         ABC.abc_scatter_labels([row[2] for row in unsorted_adu], x, y)
 
     @staticmethod
-    def annual_dollar_usage(item_no, m):
-        # compute ADU
-        adu = [[item_no[k,0],m[k,0]*m[k,1]] for k in range(0,len(m))]
+    def ahp_weights(prefs: List[float]):
+        """
+        Analytical Hierarchy Process (AHP) weight computation
         
-        # append ADU classes
-        #for k in range(0,len(adu)):
-        #    adu[k].append(data[k+1][8])
+        Arguments:
+            prefs {np.matrix} -- the AHP preference matrix
+        
+        Returns:
+            [type] -- the AHP category weigths
+        """
 
-        adu = sorted(adu,key=lambda x: x[1], reverse=True)
+        eig_val, eig_vec = np.linalg.eig(prefs)
+        index = list(eig_val).index(max([np.linalg.norm(eig_val[k]) for k in range(0,len(eig_val))])) # index of max eigval
+        return np.real(np.transpose(eig_vec)[index]/sum(np.transpose(eig_vec)[index])) 
+
+    @staticmethod
+    def ahp(item_no: np.matrix, m: np.matrix, w: np.matrix):
+        """
+        ABC analysis according to Analytical Hierarchy Process (AHP)
+
+        Arguments:
+            item_no {[type]} -- list of item numbers
+            m {[type]} -- ranking criteria
+        
+        Returns:
+            [type] -- a matrix of item ranked and classified according to AHP
+        """
+        fmin, fmax = m.min(0), m.max(0)
+        norm = lambda i, v : (v-fmin[0,i])/(fmax[0,i]-fmin[0,i])
+        ahp = [[item_no[k,0],sum(w[i]*norm(i, m[k,i]) for i in range(0,4))] for k in range(0,len(m))]
+        ahp = sorted(ahp,key=lambda x: x[1], reverse=True)
 
         # annotate ABC
-        ABC.annotate_ABC(adu)
+        ABC.annotate_ABC(ahp)
 
-        return sorted(adu,key=lambda x: int(x[0][1:]), reverse=False)
+        return ahp
 
     @staticmethod
     def ahp_instance():
@@ -112,30 +156,18 @@ class ABC:
             [1,1,1/3,1/6],
             [8,3,1,1],
             [4,6,1,1]]
-        v = np.linalg.eig(prefs)
         #weights for average unit cost, annual dollar usage, criticality, lead time
-        w = np.real(np.transpose(v[1])[0]/sum(np.transpose(v[1])[0])) # [0.078,0.092,0.42,0.41] 
+        w = ABC.ahp_weights(prefs) # [0.078,0.092,0.42,0.41] 
+        print(w)
 
         # compute AHP
-        fmin, fmax = m.min(0), m.max(0)
-        norm = lambda i, v : (v-fmin[0,i])/(fmax[0,i]-fmin[0,i])
-        ahp = [[item_no[k,0],sum(w[i]*norm(i, m[k,i]) for i in range(0,4))] for k in range(0,len(m))]
+        ahp = ABC.ahp(item_no, m, w)
         
-        # append ADU classes
-        for k in range(0,len(ahp)):
-            ahp[k].append(data[k+1][8])
-
-        ahp = sorted(ahp,key=lambda x: x[1], reverse=True)
-
-        # annotate ABC
-        ABC.annotate_ABC(ahp)
-
         unsorted_ahp = sorted(ahp,key=lambda x: int(x[0][1:]), reverse=False)
-
         print(np.matrix(unsorted_ahp))
         
         x, y = 1, 2 #1,2,6,7
-        ABC.abc_scatter_labels([row[3] for row in unsorted_ahp], x, y)
+        ABC.abc_scatter_labels([row[2] for row in unsorted_ahp], x, y)
 
     @staticmethod
     def dea_instance(scaled: bool):
