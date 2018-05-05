@@ -14,6 +14,7 @@ from typing import List
 from scipy.optimize import linprog
 import matplotlib.pyplot as plt
 import codecs
+import sys
 
 from sklearn.model_selection import train_test_split 
 from sklearn.preprocessing import StandardScaler 
@@ -101,7 +102,7 @@ class ABC:
         print(np.matrix(unsorted_adu))
         
         x, y = 1, 2 #1,2,6,7
-        ABC.abc_scatter_labels([row[2] for row in unsorted_adu], x, y)
+        ABC.abc_scatter_labels([row[2] for row in unsorted_adu], x, y, "ADU")
 
     @staticmethod
     def ahp_weights(prefs: List[float]):
@@ -167,7 +168,7 @@ class ABC:
         print(np.matrix(unsorted_ahp))
         
         x, y = 1, 2 #1,2,6,7
-        ABC.abc_scatter_labels([row[2] for row in unsorted_ahp], x, y)
+        ABC.abc_scatter_labels([row[2] for row in unsorted_ahp], x, y, "AHP")
 
     @staticmethod
     def dea_instance(scaled: bool):
@@ -202,7 +203,7 @@ class ABC:
         print(np.matrix(unsorted_dea))
         
         x, y = 1, 2 #1,2,6,7
-        ABC.abc_scatter_labels([row[3] for row in unsorted_dea], x, y)
+        ABC.abc_scatter_labels([row[3] for row in unsorted_dea], x, y, "DEA")
 
     @staticmethod
     def k_nn_example():
@@ -246,6 +247,7 @@ class ABC:
         plt.xlabel(np.matrix(data)[0,x])
         plt.ylabel(np.matrix(data)[0,y])
         plt.grid(True)
+        
         # show plot
         plt.show()
 
@@ -282,7 +284,7 @@ class ABC:
         print(np.matrix(matrix))
         
         x, y = 1, 2 #1,2,6,7
-        ABC.abc_scatter_labels(labels, x, y)
+        ABC.abc_scatter_labels(labels, x, y, "kNN")
 
     @staticmethod
     def pca():
@@ -321,10 +323,10 @@ class ABC:
         print(np.matrix(unsorted_pca))
         
         x, y = 1, 2 #1,2,6,7
-        ABC.abc_scatter_labels([row[3] for row in unsorted_pca], x, y)
+        ABC.abc_scatter_labels([row[3] for row in unsorted_pca], x, y, "PCA")
 
     @staticmethod
-    def abc_scatter_labels(labels, x, y):
+    def abc_scatter_labels(labels, x, y, method):
         # prepare data
         d = ABC()
         # print(np.matrix(d.data))
@@ -341,6 +343,7 @@ class ABC:
         # plot label and grid
         plt.xlabel(np.matrix(d.data)[0,x])
         plt.ylabel(np.matrix(d.data)[0,y])
+        plt.title(method)
         plt.grid(True)
         # show plot
         plt.show()
@@ -359,7 +362,11 @@ class ABC:
             raise e 
 
 if __name__ == '__main__':
-    abc_strategy = 'ADU'
+    algos = ['ADU', 'AHP', 'DEA', 'kNN', 'PCA']
+    if len(sys.argv) == 2 and sys.argv[1] in algos:
+        abc_strategy = sys.argv[1]
+    else:
+        abc_strategy = 'ADU'
 
     if abc_strategy == 'ADU':
         ABC.annual_dollar_usage_instance()
