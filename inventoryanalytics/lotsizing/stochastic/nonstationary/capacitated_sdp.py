@@ -200,7 +200,8 @@ class StochasticLotSizing:
         S = self.max_inv-1
         while k < 1000:
             x = rnd.randint(min_inv,S)  #46
-            a = rnd.randint(0,S-x)      #116
+            #a = rnd.randint(0,S-x)      #116
+            a = rnd.randint(0,min(S-x,self.B))      
             gx, gxa, gxd = self.f(x), self.f(x+a), self.f(x+step) - self.f(x)
             if self.K + gxa - gx - a*gxd < 0:
                 print("K:" + str(self.K))
@@ -273,13 +274,21 @@ if __name__ == '__main__':
 
     print()
     print("***************************")
-    S = skSk_policy[0][0][1]
-    print("The function is K convex") if lot_sizing_no_order.testKConvexity(min_inv, S) else print("The function is not K convex")
+    try:
+        S = skSk_policy[0][0][1]
+        print("The function is K convex") if lot_sizing_no_order.testKConvexity(min_inv, S) else print("The function is not K convex")
+    except Exception as e:
+        print("K convexity test failed")
+        print(str(e))
     print("***************************")
 
     print()
     print("***************************")
-    print("The function is derivative bounded") if lot_sizing_no_order.testDerivativeBoundedness(skSk_policy[0][0][0]) else print("The function is not derivative bounded")
+    try:
+        print("The function is derivative bounded") if lot_sizing_no_order.testDerivativeBoundedness(skSk_policy[0][0][0]) else print("The function is not derivative bounded")
+    except Exception as e:
+        print("Derivative boundedness test failed")
+        print(str(e))
     print("***************************")
 
     plt.show()
