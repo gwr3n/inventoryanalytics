@@ -97,12 +97,18 @@ class StochasticLotSizing:
             q {float} -- quantile truncation for the demand
             initial_order {bool} -- allow order in the first period
         """
+
         # placeholders
         max_demand = lambda d: sp.poisson(d).ppf(q).astype(int)         # max demand in the support
+        #cv = 0.15                                                        # coefficient of variation
+        #max_demand = lambda d: sp.norm(d, cv*d).ppf(q).astype(int)       # max demand in the support
         
         # initialize instance variables
         self.T, self.K, self.B, self.v, self.h, self.p, self.d, self.max_inv = len(d)-1, K, B, v, h, p, d, max_inv
         pmf = lambda d, k : sp.poisson(d).pmf(k)/q                      # poisson pmf
+        #pmf = lambda d, k : (sp.norm(d, cv*d).cdf(k+0.5) - \
+        #                     sp.norm(d, cv*d).cdf(k-0.5)) / \
+        #                    (q-sp.norm(d, cv*d).cdf(-0.5)) # normal pmf
         self.pmf = [[[k, pmf(d, k)] for k in range(0, max_demand(d))] for d in self.d]
 
         # lambdas
@@ -195,13 +201,12 @@ class StochasticLotSizing:
                 level, s, nextState = level - 1, State(t, level - 1), State(t, level)
         return policy_parameters
 
-    def testKConvexity(self, min_inv, S) -> bool:
+    def testKConvexity(self, min_inv) -> bool:
         step, k = 1, 0
-        S = self.max_inv-1
         while k < 1000:
-            x = rnd.randint(min_inv,S)  #46
-            #a = rnd.randint(0,S-x)      #116
-            a = rnd.randint(0,min(S-x,self.B))      
+            x = rnd.randint(min_inv, self.max_inv-1)  #46
+            #a = rnd.randint(0,self.max_inv-1-x)      #116
+            a = rnd.randint(0,min(self.max_inv-1-x,self.B))      
             gx, gxa, gxd = self.f(x), self.f(x+a), self.f(x+step) - self.f(x)
             if self.K + gxa - gx - a*gxd < 0:
                 print("K:" + str(self.K))
@@ -217,28 +222,12 @@ class StochasticLotSizing:
                 k += 1
         return True
 
-    def testDerivativeBoundedness(self, s) -> bool:
-        step, k = 1, 0
-        ds = self.f(s) - self.f(s-step)
-        while k < 1000:
-            a = rnd.randint(s,self.max_inv-s)
-            da = self.f(a+step) - self.f(a)
-            if da < ds:
-                print("s:" + str(s))
-                print("ds:" + str(ds))
-                print("a:" + str(a))
-                print("da:" + str(da))
-                print("Discrepancy: "+str(da-ds))
-                print("If discrepancy is very low, this may be due to rounding errors.")
-                return False
-            else:
-                k += 1
-        return True
-
 if __name__ == '__main__':
     domain = (-20,200)          # inventory level domain for plotting
-    instance = {"K": 200, "B": 65, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40],
+    instance = {"K": 100, "B": 65, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40],
                 "max_inv": 300, "q": 0.99999, "initial_order": False}
+    #instance = {"K": 50, "B": 50, "v": 0, "h": 1, "p": 10, "d": [20],
+    #            "max_inv": 300, "q": 0.99999, "initial_order": False}
     
     # This cycle also builds the internal map
     lot_sizing_no_order = StochasticLotSizing(**instance)
@@ -258,6 +247,11 @@ if __name__ == '__main__':
     plt.plot([k for k in range(*domain)], [lot_sizing_order.q(0,k) for k in range(*domain)])
     plt.ylabel('Optimal policy cost')
 
+    # Plot C(y)
+    plt.plot([k for k in range(*domain)], [lot_sizing_order.f(k) for k in range(*domain)])
+    #plt.plot([k for k in range(*domain)], [lot_sizing_no_order.f(k) - (lot_sizing_no_order.f(k+65)+100) for k in range(*domain)])
+    #print(list(zip([k for k in range(*domain)], [lot_sizing_no_order.f(k) - (lot_sizing_no_order.f(k+60)+50) for k in range(*domain)])))
+
     # Extract [sk,Sk] Policy 
     print()
     print("****** [sk,Sk] Policy *****")
@@ -275,19 +269,9 @@ if __name__ == '__main__':
     print()
     print("***************************")
     try:
-        S = skSk_policy[0][0][1]
-        print("The function is K convex") if lot_sizing_no_order.testKConvexity(min_inv, S) else print("The function is not K convex")
+        print("The function is K convex") if lot_sizing_no_order.testKConvexity(min_inv) else print("The function is not K convex")
     except Exception as e:
         print("K convexity test failed")
-        print(str(e))
-    print("***************************")
-
-    print()
-    print("***************************")
-    try:
-        print("The function is derivative bounded") if lot_sizing_no_order.testDerivativeBoundedness(skSk_policy[0][0][0]) else print("The function is not derivative bounded")
-    except Exception as e:
-        print("Derivative boundedness test failed")
         print(str(e))
     print("***************************")
 
