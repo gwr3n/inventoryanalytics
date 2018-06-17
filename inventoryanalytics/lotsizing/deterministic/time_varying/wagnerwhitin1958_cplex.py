@@ -16,6 +16,7 @@ import sys
 sys.path.insert(0,'/Applications/CPLEX_Studio128/cplex/python/3.6/x86-64_osx')
 
 # http://ibmdecisionoptimization.github.io/docplex-doc/mp/creating_model.html
+# http://www-01.ibm.com/support/docview.wss?uid=swg27042869&aid=1
 
 class WagnerWhitin:
     """
@@ -60,6 +61,7 @@ class WagnerWhitin:
         self.msol = model.solve()
         if self.msol:
             model.print_solution()
+            print(model.solution.get_value("Q_2"))
         else:
             print("Solve status: " + self.msol.get_solve_status() + "\n")
         
