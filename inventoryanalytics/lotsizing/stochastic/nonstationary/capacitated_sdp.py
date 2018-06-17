@@ -21,7 +21,6 @@ class memoize(object):
     Memoization utility
     """
 
-
     def __init__(self, func): 
         self.func = func 
         self.memoized = {} 
