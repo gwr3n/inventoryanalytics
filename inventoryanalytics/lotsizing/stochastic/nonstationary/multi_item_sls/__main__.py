@@ -4,9 +4,6 @@ import inventoryanalytics.lotsizing.stochastic.nonstationary.sdp_multi_item as s
 '''
 Optimal policy cost: 52.45080337182663
 Optimal order quantity: (4, 4)
-
-Optimal policy cost: 42.42570977263608
-Optimal order quantity: (8, 8)
 '''
 
 instance = {"K": 10, "v": 0, "h": 1, "p": 5, "d": [3,6,9,6],
