@@ -268,9 +268,9 @@ if __name__ == '__main__':
     print()
     print("***************************")
     try:
-        print("The function is K convex") if lot_sizing_no_order.testKConvexity(min_inv) else print("The function is not K convex")
+        print("The function is (K,B)-convex") if lot_sizing_no_order.testKConvexity(min_inv) else print("The function is not (K,B)-convex")
     except Exception as e:
-        print("K convexity test failed")
+        print("(K,B)-convexity test failed")
         print(str(e))
     print("***************************")
 
