@@ -200,11 +200,10 @@ class StochasticLotSizing:
                 level, s, nextState = level - 1, State(t, level - 1), State(t, level)
         return policy_parameters
 
-    def testKConvexity(self, min_inv) -> bool:
+    def testKBConvexity(self, min_inv) -> bool:
         step, k = 1, 0
         while k < 1000:
-            x = rnd.randint(min_inv, self.max_inv-1)  #46
-            #a = rnd.randint(0,self.max_inv-1-x)      #116
+            x = rnd.randint(min_inv, self.max_inv-1)
             a = rnd.randint(0,min(self.max_inv-1-x,self.B))      
             gx, gxa, gxd = self.f(x), self.f(x+a), self.f(x+step) - self.f(x)
             if self.K + gxa - gx - a*gxd < 0:
@@ -220,13 +219,18 @@ class StochasticLotSizing:
             else:
                 k += 1
         return True
+    
+    def testAlwaysOrder(self, domain) -> bool:
+        t = 0
+        orders = [lot_sizing_order.q(t, i) for i in range(*domain)]
+        while(orders[-1]==0):
+            orders.pop(-1)
+        return orders.count(0) == 0 
 
 if __name__ == '__main__':
     domain = (-20,200)          # inventory level domain for plotting
     instance = {"K": 100, "B": 65, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40],
-                "max_inv": 300, "q": 0.99999, "initial_order": False}
-    #instance = {"K": 50, "B": 50, "v": 0, "h": 1, "p": 10, "d": [20],
-    #            "max_inv": 300, "q": 0.99999, "initial_order": False}
+                "max_inv": 300, "q": 0.999, "initial_order": False}
     
     # This cycle also builds the internal map
     lot_sizing_no_order = StochasticLotSizing(**instance)
@@ -243,13 +247,18 @@ if __name__ == '__main__':
     for i in range(*domain):    # range over inventory level domain
         print("Optimal policy cost: "    + str(lot_sizing_order.f(i)))
         print("Optimal order quantity("+str(i)+"): " + str(lot_sizing_order.q(t, i)))
+    #Plot Q
     plt.plot([k for k in range(*domain)], [lot_sizing_order.q(0,k) for k in range(*domain)])
     plt.ylabel('Optimal policy cost')
 
     # Plot C(y)
     plt.plot([k for k in range(*domain)], [lot_sizing_order.f(k) for k in range(*domain)])
-    #plt.plot([k for k in range(*domain)], [lot_sizing_no_order.f(k) - (lot_sizing_no_order.f(k+65)+100) for k in range(*domain)])
-    #print(list(zip([k for k in range(*domain)], [lot_sizing_no_order.f(k) - (lot_sizing_no_order.f(k+60)+50) for k in range(*domain)])))
+    
+    # Plot C(y)-G(y)
+    plt.plot([k for k in range(*domain)], [lot_sizing_order.f(k) - lot_sizing_no_order.f(k) for k in range(*domain)])
+
+    # Print G
+    #print(list(zip([k for k in range(*domain)], [lot_sizing_no_order.f(k) for k in range(*domain)])))
 
     # Extract [sk,Sk] Policy 
     print()
@@ -268,9 +277,18 @@ if __name__ == '__main__':
     print()
     print("***************************")
     try:
-        print("The function is (K,B)-convex") if lot_sizing_no_order.testKConvexity(min_inv) else print("The function is not (K,B)-convex")
+        print("The function is (K,B)-convex") if lot_sizing_no_order.testKBConvexity(min_inv) else print("The function is not (K,B)-convex")
     except Exception as e:
         print("(K,B)-convexity test failed")
+        print(str(e))
+    print("***************************")
+
+    print()
+    print("***************************")
+    try:
+        print("The function satisfies the AlwaysOrder property") if lot_sizing_no_order.testAlwaysOrder(domain) else print("The function does not satisfy the AlwaysOrder property")
+    except Exception as e:
+        print("AlwaysOrder test failed")
         print(str(e))
     print("***************************")
 
