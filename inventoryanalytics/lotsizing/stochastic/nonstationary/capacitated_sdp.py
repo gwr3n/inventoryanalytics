@@ -409,9 +409,8 @@ if __name__ == '__main__':
     print()
     print("********** Checks *********")
 
-    # Set a suitable timeout in seconds for KBConvexity check
     try:
-        if lot_sizing_no_order.testKBConvexity():
+        if lot_sizing_no_order.testKBConvexity():          # Decorate this function to set a suitable timeout in seconds
             print("The function G(y) is (K,B)-convex")  
         else: 
             print("The function G(y) is not (K,B)-convex")
