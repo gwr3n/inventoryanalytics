@@ -45,6 +45,49 @@ class memoize(object):
         self.memoized = {} 
         self.method_cache = {} 
 
+class Demand:
+    def pmf(self) -> List[float]:
+        return self.pmf
+
+class PoissonDemand(Demand):
+    def __init__(self, d: List[float], q: float):
+        """Creates an instance of PoissonDemand
+
+        Arguments:
+            d {List[float]} -- the demand rates
+            q {float} -- quantile truncation for the demand
+        """
+        self.d = d
+        self.max_demand = lambda d: sp.poisson(d).ppf(q).astype(int)                           # max demand in the support
+        self.p = lambda d, k : sp.poisson(d).pmf(k)/q                                          # poisson pmf
+        self.pmf = [[[k, self.p(d, k)] for k in range(0, self.max_demand(d))] for d in self.d] # pmf
+
+class NormalDemand(Demand):
+    def __init__(self, d: List[float], cv: float, q: float):
+        """[summary]
+
+        Arguments:
+            d {List[float]} -- the demand mean
+            cv {float} -- the coefficient of variation
+            q {float} -- quantile truncation for the demand
+        """
+        self.d, self.cv  = d, cv
+        self.max_demand = lambda d: sp.norm(d, cv*d).ppf(q).astype(int)                        # max demand in the support
+        self.p = lambda d, k : (sp.norm(d, cv*d).cdf(k+0.5) - \
+                                sp.norm(d, cv*d).cdf(k-0.5)) / \
+                               (q+0.5-sp.norm(d, cv*d).cdf(-0.5))                              # normal pmf
+        self.pmf = [[[k, self.p(d, k)] for k in range(0, self.max_demand(d))] for d in self.d] # pmf
+
+class PmfDemand(Demand):
+    def __init__(self, pmf: List[float]):
+        """Creates an instance of PmfDemand from a pmf
+
+        Arguments:
+            pmf {List[float]} -- the pmf expressed as [[0,0.5],[5,0.5]] where in [5,0.5] 
+                                 5 is the demand and 0.5 the associated probabilty mass
+        """
+        self.pmf = pmf
+
 class State:
     """
     The state of the inventory system.
@@ -80,8 +123,8 @@ class StochasticLotSizing:
         [type] -- A problem instance
     """
 
-    def __init__(self, K: float, B: float, v: float, h: float, p: float, d: List[float], 
-                 max_inv: float, q: float, initial_order: bool):
+    def __init__(self, K: float, B: float, v: float, h: float, p: float, w: float, d: Demand, 
+                 max_inv: float, initial_order: bool):
         """
         Create an instance of StochasticLotSizing.
         
@@ -91,24 +134,15 @@ class StochasticLotSizing:
             v {float} -- the proportional unit ordering cost
             h {float} -- the proportional unit inventory holding cost
             p {float} -- the proportional unit inventory penalty cost
-            d {List[float]} -- the mean demand (assume Poisson distribution).
+            w {float} -- the discount factor
+            d {Demand} -- the demand
             max_inv {float} -- the maximum inventory level
-            q {float} -- quantile truncation for the demand
             initial_order {bool} -- allow order in the first period
         """
 
-        # placeholders
-        max_demand = lambda d: sp.poisson(d).ppf(q).astype(int)         # max demand in the support
-        #cv = 0.15                                                        # coefficient of variation
-        #max_demand = lambda d: sp.norm(d, cv*d).ppf(q).astype(int)       # max demand in the support
-        
         # initialize instance variables
-        self.T, self.K, self.B, self.v, self.h, self.p, self.d, self.max_inv = len(d)-1, K, B, v, h, p, d, max_inv
-        pmf = lambda d, k : sp.poisson(d).pmf(k)/q                      # poisson pmf
-        #pmf = lambda d, k : (sp.norm(d, cv*d).cdf(k+0.5) - \
-        #                     sp.norm(d, cv*d).cdf(k-0.5)) / \
-        #                    (q-sp.norm(d, cv*d).cdf(-0.5)) # normal pmf
-        self.pmf = [[[k, pmf(d, k)] for k in range(0, max_demand(d))] for d in self.d]
+        self.T, self.K, self.B, self.v, self.h, self.p, self.w, self.max_inv = len(d.pmf), K, B, v, h, p, w, max_inv
+        self.pmf = d.pmf
 
         # lambdas
         if initial_order:                                               # action generator
@@ -166,12 +200,12 @@ class StochasticLotSizing:
         #Forward recursion
         v = min(                                                                # optimal cost
             [sum([p[1]*(self.iv(s, a, p[0])+                                    # immediate cost
-                       (self._f(self.st(s, a, p[0])) if s.t < self.T else 0))   # future cost
+                       (self.w*self._f(self.st(s, a, p[0])) if s.t < self.T-1 else 0))   # future cost
                   for p in self.pmf[s.t]])                                      # demand realisations
              for a in self.ag(s)])                                              # actions
 
         opt_a = lambda a: sum([p[1]*(self.iv(s, a, p[0])+                       # optimal action
-                                    (self._f(self.st(s, a, p[0])) if s.t < self.T else 0)) 
+                                    (self.w*self._f(self.st(s, a, p[0])) if s.t < self.T-1 else 0)) 
                                for p in self.pmf[s.t]]) == v          
                                
         q = [k for k in filter(opt_a, self.ag(s))]                              # retrieve best action list
@@ -189,7 +223,7 @@ class StochasticLotSizing:
         for i in range(min_inv, self.max_inv):
             self.f(i)
         policy_parameters = []
-        for t in range(0, len(self.d)):
+        for t in range(0, len(self.pmf)):
             policy_parameters.append([])
             level, min_level = self.max_inv - 2, min_inv
             s, nextState = State(t, level), State(t, level+1)
@@ -229,8 +263,20 @@ class StochasticLotSizing:
 
 if __name__ == '__main__':
     domain = (-20,200)          # inventory level domain for plotting
-    instance = {"K": 100, "B": 65, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40],
-                "max_inv": 300, "q": 0.999, "initial_order": False}
+    
+    # Shiaoxiang 1996
+    # instance = {"K": 22, "B": 9, "v": 0, "h": 1, "p": 10, "w": 0.9, 
+    #             "d": PmfDemand([[[6, 0.95], [7, 0.05]] for k in range(20)]), 
+    #             "max_inv": 300, "initial_order": False}
+
+    # Gallego 2000
+    # instance = {"K": 10, "B": 10, "v": 0, "h": 1, "p": 9, "w": 0.9, 
+    #             "d": PmfDemand([[[1, 0.15], [6, 0.70], [7, 0.15]] for k in range(52)]), 
+    #             "max_inv": 300, "initial_order": False}
+    
+    # Rossi et al. 2020
+    instance = {"K": 100, "B": 65, "v": 0, "h": 1, "p": 10, "w": 1, "d": PoissonDemand([20,40,60,40],0.9999), "max_inv": 300, "initial_order": False}
+    # instance = {"K": 100, "B": 65, "v": 0, "h": 1, "p": 10, "w": 1, "d": NormalDemand([20,40,60,40], 0.25 ,0.9999), "max_inv": 300, "initial_order": False}
     
     # This cycle also builds the internal map
     lot_sizing_no_order = StochasticLotSizing(**instance)
@@ -239,7 +285,9 @@ if __name__ == '__main__':
         print("Optimal policy cost: "    + str(lot_sizing_no_order.f(i)))
     
     # Plot G(y)
-    plt.plot([k for k in range(*domain)], [lot_sizing_no_order.f(k) for k in range(*domain)])
+    plt.plot([k for k in range(*domain)], [lot_sizing_no_order.f(k) for k in range(*domain)], label='G(y)')
+    # Print G
+    # print(list(zip([k for k in range(*domain)], [lot_sizing_no_order.f(k) for k in range(*domain)])))
 
     # Build action map
     instance["initial_order"]=True
@@ -247,18 +295,20 @@ if __name__ == '__main__':
     for i in range(*domain):    # range over inventory level domain
         print("Optimal policy cost: "    + str(lot_sizing_order.f(i)))
         print("Optimal order quantity("+str(i)+"): " + str(lot_sizing_order.q(t, i)))
-    #Plot Q
-    plt.plot([k for k in range(*domain)], [lot_sizing_order.q(0,k) for k in range(*domain)])
-    plt.ylabel('Optimal policy cost')
 
     # Plot C(y)
-    plt.plot([k for k in range(*domain)], [lot_sizing_order.f(k) for k in range(*domain)])
+    plt.plot([k for k in range(*domain)], [lot_sizing_order.f(k) for k in range(*domain)], label='C(y)')
+    # Print C
+    # print(list(zip([k for k in range(*domain)], [lot_sizing_order.f(k) for k in range(*domain)])))
     
     # Plot C(y)-G(y)
-    plt.plot([k for k in range(*domain)], [lot_sizing_order.f(k) - lot_sizing_no_order.f(k) for k in range(*domain)])
+    plt.plot([k for k in range(*domain)], [lot_sizing_order.f(k) - lot_sizing_no_order.f(k) for k in range(*domain)], 
+             label='C(y)-G(y)')
+    # print(list(zip([k for k in range(*domain)], [lot_sizing_order.f(k) - lot_sizing_no_order.f(k) for k in range(*domain)])))
 
-    # Print G
-    #print(list(zip([k for k in range(*domain)], [lot_sizing_no_order.f(k) for k in range(*domain)])))
+    #Plot Q
+    plt.scatter([k for k in range(*domain)], [lot_sizing_order.q(0,k) for k in range(*domain)], s=2, label='Q')
+    plt.ylabel('Optimal policy cost')
 
     # Extract [sk,Sk] Policy 
     print()
@@ -292,4 +342,5 @@ if __name__ == '__main__':
         print(str(e))
     print("***************************")
 
+    plt.legend()
     plt.show()
