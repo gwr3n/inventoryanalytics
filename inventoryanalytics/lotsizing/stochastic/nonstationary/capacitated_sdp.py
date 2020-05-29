@@ -25,10 +25,10 @@ def timer(func):
     """Print the runtime of the decorated function"""
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
-        start_time = time.perf_counter()    
+        start_time = time.perf_counter()    # 1
         value = func(*args, **kwargs)
-        end_time = time.perf_counter()      
-        run_time = end_time - start_time    
+        end_time = time.perf_counter()      # 2
+        run_time = end_time - start_time    # 3
         print(f"Finished {func.__name__!r} in {run_time:.4f} secs")
         return value
     return wrapper_timer
@@ -308,7 +308,7 @@ class StochasticLotSizing:
         while k < N:
             x = rnd.randint(self.min_inv, self.max_inv-1)
             a = rnd.randint(0,min(self.max_inv-1-x,self.B))      
-            gx, gxa, gxd = self.f(x), self.f(x+a), self.f(x+step) - self.f(x)
+            gx, gxa, gxd = self.f(x), self.f(x+a), self.f(x) - self.f(x-step)
             if self.K + gxa - gx - a*gxd < 0:
                 print("K:" + str(self.K))
                 print("x:" + str(x))
@@ -410,7 +410,7 @@ if __name__ == '__main__':
     print("********** Checks *********")
 
     try:
-        if lot_sizing_no_order.testKBConvexity():          # Decorate this function to set a suitable timeout in seconds
+        if lot_sizing_no_order.testKBConvexity():           # Decorate this function to set a suitable timeout in seconds
             print("The function G(y) is (K,B)-convex")  
         else: 
             print("The function G(y) is not (K,B)-convex")
