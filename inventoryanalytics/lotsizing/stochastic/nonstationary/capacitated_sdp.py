@@ -186,7 +186,7 @@ class StochasticLotSizing:
             self.ag = lambda s: [x for x in range(0, min(max_inv-s.I, self.B+1))] if s.t > 0 else [0] 
         self.st = lambda s, a, d: State(s.t+1, s.I+a-d)                 # state transition
         L = lambda i,a,d : self.h*max(i+a-d, 0) + self.p*max(d-i-a, 0)  # immediate holding/penalty cost
-        self.iv = lambda s, a, d: (self.K if a > 0 else 0) + L(s.I, a, d) # immediate value function
+        self.iv = lambda s, a, d: (self.K+v*a if a > 0 else 0) + L(s.I, a, d) # immediate value function
 
         self.cache_actions = {}                                         # cache with optimal state/action pairs
 
