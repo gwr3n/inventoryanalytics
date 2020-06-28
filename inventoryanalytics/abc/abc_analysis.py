@@ -24,7 +24,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 class ABC:
 
     def __init__(self, file='./inventoryanalytics/abc/data/Flores1992.csv'):
-        self.data = ABC.readData(file)
+        self.data = ABC._readData(file)
 
     @staticmethod
     def annotate_ABC(m, class_breakpoints: dict = {'A': 0.2, 'B': 0.5, 'C': 1}):
@@ -206,52 +206,6 @@ class ABC:
         ABC.abc_scatter_labels([row[3] for row in unsorted_dea], x, y, "DEA")
 
     @staticmethod
-    def k_nn_example():
-
-        # prepare data
-        d = ABC('./inventoryanalytics/abc/data/training_knn.csv')
-        data = d.data
-
-        X = np.matrix(data)[1:,[1,2]]
-        Y = np.matrix(data)[1:,8]
-
-        scaler = StandardScaler()  
-        scaler.fit(X)
-        X = scaler.transform(X)
-
-        classifier = KNeighborsClassifier(n_neighbors=3) 
-        classifier.fit(X, Y) 
-
-        point = scaler.transform(np.matrix([[3, 60.6]]))
-        Y_pred = classifier.predict(point)
-        print(Y_pred)
-
-        my_colors = {'A':'red','B':'yellow','C':'green'}
-        for k in range(0,X.shape[0]-1):
-            plt.scatter(X[:,0].flatten().tolist()[k],
-                        X[:,1].flatten().tolist()[k],
-                        color = my_colors.get(Y.flatten().tolist()[0][k]))
-            plt.annotate(Y.flatten().tolist()[0][k],
-                         (X[:,0].flatten().tolist()[k],
-                          X[:,1].flatten().tolist()[k]))
-        
-        plt.scatter(point[:,0].flatten().tolist()[0],
-                    point[:,1].flatten().tolist()[0],
-                    color = 'blue')
-        plt.annotate(Y_pred[0],
-                     (point[:,0].flatten().tolist()[0],
-                      point[:,1].flatten().tolist()[0]))
-
-        # plot label and grid
-        x, y = 1, 2
-        plt.xlabel(np.matrix(data)[0,x])
-        plt.ylabel(np.matrix(data)[0,y])
-        plt.grid(True)
-        
-        # show plot
-        plt.show()
-
-    @staticmethod
     def k_nn():
         # http://stackabuse.com/k-nearest-neighbors-algorithm-in-python-and-scikit-learn/
 
@@ -349,7 +303,7 @@ class ABC:
         plt.show()
 
     @staticmethod
-    def readData(file: str):
+    def _readData(file: str):
         d = []
         try:
             with codecs.open(file, "r", "utf-8") as csvfile:
@@ -376,7 +330,6 @@ if __name__ == '__main__':
         scaled = False
         ABC.dea_instance(scaled)
     elif abc_strategy == 'kNN':
-        #abc.k_nn_example()
         ABC.k_nn()
     elif abc_strategy == 'PCA':
         ABC.pca()
