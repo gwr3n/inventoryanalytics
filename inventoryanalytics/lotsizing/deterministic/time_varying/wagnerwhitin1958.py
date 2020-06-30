@@ -188,18 +188,15 @@ class WagnerWhitinDPI0(WagnerWhitin):
         Compute the cost of a replenishment cycle covering periods i,...,j
         '''
         if i>j: raise Exception('i>j')
-
-        cost_with_order = self.K + \
-                          self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) 
                           
-        if i == 0 and sum(self.d[0:j+1]) <= self.I0:
-            cost_no_order = self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) + \
-                            self.h * (self.I0-sum(self.d[0:j+1]))
-            return min(cost_with_order, cost_no_order)
+        if i == 0 and sum(self.d[0:j+1]) <= self.I0: 
+            return self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) + \
+                   self.h * (self.I0-sum(self.d[0:j+1])) # cost no order
         elif i >= 0 and sum(self.d[0:j+1]) <= self.I0:
             return sys.maxsize
-
-        return cost_with_order
+        else: 
+            return self.K + self.h * \
+                   sum([(k-i)*self.d[k] for k in range(i,j+1)]) # cost with order
 
     def optimal_cost(self) -> float:
         '''
