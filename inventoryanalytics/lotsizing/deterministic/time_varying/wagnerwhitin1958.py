@@ -192,7 +192,7 @@ class WagnerWhitinDPI0(WagnerWhitin):
         if i == 0 and sum(self.d[0:j+1]) <= self.I0: 
             return self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) + \
                    self.h * (self.I0-sum(self.d[0:j+1])) # cost no order
-        elif i >= 0 and sum(self.d[0:j+1]) <= self.I0:
+        elif i > 0 and sum(self.d[0:j+1]) <= self.I0:
             return sys.maxsize
         else: 
             return self.K + self.h * \
