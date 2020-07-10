@@ -8,8 +8,6 @@ MIT License
 Copyright (c) 2018 Roberto Rossi
 '''
 
-from typing import List
-
 from docplex.mp.model import Model
 import sys
 
@@ -56,6 +54,7 @@ class WagnerWhitinCPLEX(WagnerWhitin):
             K {float} -- the fixed ordering cost
             h {float} -- the per unit holding cost
             d {List[float]} -- the demand in each period
+            I0 {float} -- the initial inventory level
         """
         super().__init__(K, h, d, I0)
         self.model()
@@ -101,8 +100,7 @@ class WagnerWhitinCPLEX(WagnerWhitin):
     def _test():
         instance = {"K": 30, "h": 1, "d":[10,20,30,40], "I0": 0}
         ww = WagnerWhitinCPLEX(**instance)
-        ww.model()
-
+        
 class WagnerWhitinDP(WagnerWhitin):
     """
     Implements the traditional Wagner-Whitin shortest path algorithm.
