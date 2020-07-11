@@ -1,1 +1,1 @@
-__all__ = ["wagnerwhitin1958a","wagnerwhitin1958b"]
+__all__ = ["planned_backorders","wagnerwhitin1958"]
