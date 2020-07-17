@@ -21,7 +21,7 @@ class ZhengFedergruen(object):
     The stationary stochastic lot sizing problem.
 
     Zheng, Y., & Federgruen, A. (1991). Finding optimal (s, s) policies is about
-    as simple as evaluating a single policy. Operations research, 39 , 654{665.
+    as simple as evaluating a single policy. Operations research, 39 , 654-665.
     doi:10.1287/opre.39.4.654.
     
     """
