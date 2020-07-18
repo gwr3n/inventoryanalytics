@@ -106,67 +106,7 @@ class WagnerWhitinDP(WagnerWhitin):
     Implements the traditional Wagner-Whitin shortest path algorithm.
     """
 
-    def __init__(self, K: float, h: float, d: List[float]):
-        """
-        Create an instance of a Wagner-Whitin problem.
-
-        Arguments:
-            K {float} -- the fixed ordering cost
-            h {float} -- the per unit holding cost
-            d {List[float]} -- the demand in each period
-        """
-        super().__init__(K, h, d, 0)
-        self.graph = nx.DiGraph()
-        for i in range(0, len(self.d)):
-            for j in range(i+1, len(self.d)):
-                self.graph.add_edge(i, j, weight=self.cycle_cost(i, j-1))
-
-    def cycle_cost(self, i: int, j: int) -> float:
-        '''
-        Compute the cost of a replenishment cycle covering periods i,...,j
-        '''
-        if i>j: raise Exception('i>j')
-
-        return self.K + self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) 
-
-    def optimal_cost(self) -> float:
-        '''
-        Compute the cost of an optimal solution to the Wagner-Whitin problem
-        '''
-        T, cost, g = len(self.d), 0, self.graph
-        path = nx.dijkstra_path(g, 0, T-1)
-        path.append(len(self.d))
-        for t in range(1,len(path)):
-            cost += self.cycle_cost(path[t-1],path[t]-1)
-            print("c("+str(path[t-1])+","+str(path[t]-1)+") = "+str(self.cycle_cost(path[t-1],path[t]-1)))
-        return cost
-
-    def order_quantities(self) -> List[float]:
-        '''
-        Compute optimal Wagner-Whitin order quantities
-        '''
-        T, g = len(self.d), self.graph
-        path = nx.dijkstra_path(g, 0, T-1)
-        path.append(len(self.d))
-        qty = [0 for k in range(0,T)]
-        for t in range(1,len(path)):
-            qty[path[t-1]] = sum([self.d[k] for k in range(path[t-1],path[t])])
-        return qty
-
-    @staticmethod
-    def _test():
-        instance = {"K": 30, "h": 1, "d":[10,20,30,40]}
-        ww = WagnerWhitinDP(**instance)
-        print("Cost of an optimal plan: ", ww.optimal_cost())
-        print("Optimal order quantities: ", ww.order_quantities())
-
-class WagnerWhitinDPI0(WagnerWhitin):
-    """
-    Extension of the original Wagner-Whitin algorithm 
-    to embed a nonnegative initial inventory.
-    """
-
-    def __init__(self, K: float, h: float, d: List[float], I0: float):
+    def __init__(self, K: float, h: float, d: List[float], I0: float = 0):
         """
         Create an instance of a Wagner-Whitin problem.
 
@@ -176,6 +116,10 @@ class WagnerWhitinDPI0(WagnerWhitin):
             d {List[float]} -- the demand in each period
         """
         super().__init__(K, h, d, I0)
+
+        if I0 > 0:
+            self.cycle_cost = self.cycle_cost_I0
+
         self.graph = nx.DiGraph()
         for i in range(0, len(self.d)):
             for j in range(i+1, len(self.d)):
@@ -184,12 +128,22 @@ class WagnerWhitinDPI0(WagnerWhitin):
     def cycle_cost(self, i: int, j: int) -> float:
         '''
         Compute the cost of a replenishment cycle covering periods i,...,j
+        when initial inventory is zero
+        '''
+        if i>j: raise Exception('i>j')
+
+        return self.K + self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) 
+
+    def cycle_cost_I0(self, i: int, j: int) -> float:
+        '''
+        Compute the cost of a replenishment cycle covering periods i,...,j
+        when initial inventory is nonzero
         '''
         if i>j: raise Exception('i>j')
                           
         if i == 0 and sum(self.d[0:j+1]) <= self.I0: 
             return self.h * sum([(k-i)*self.d[k] for k in range(i,j+1)]) + \
-                   self.h * (self.I0-sum(self.d[0:j+1])) # cost no order
+                   self.h * (j+1) * (self.I0-sum(self.d[0:j+1])) # cost no order
         elif i > 0 and sum(self.d[0:j+1]) <= self.I0:
             return sys.maxsize
         else: 
@@ -207,7 +161,7 @@ class WagnerWhitinDPI0(WagnerWhitin):
             cost += self.cycle_cost(path[t-1],path[t]-1)
             print("c("+str(path[t-1])+","+str(path[t]-1)+") = "+str(self.cycle_cost(path[t-1],path[t]-1)))
         return cost
-
+    
     def order_quantities(self) -> List[float]:
         '''
         Compute optimal Wagner-Whitin order quantities
@@ -222,12 +176,11 @@ class WagnerWhitinDPI0(WagnerWhitin):
 
     @staticmethod
     def _test():
-        instance = {"K": 30, "h": 1, "d":[10,20,30,40], "I0": 40}
-        ww = WagnerWhitinDPI0(**instance)
+        instance = {"K": 30, "h": 1, "d":[10,20,30,40], "I0": 30}
+        ww = WagnerWhitinDP(**instance)
         print("Cost of an optimal plan: ", ww.optimal_cost())
         print("Optimal order quantities: ", ww.order_quantities())
 
 if __name__ == '__main__':
-    # WagnerWhitinDP._test()
-    WagnerWhitinDPI0._test()
     # WagnerWhitinCPLEX._test()
+    WagnerWhitinDP._test()
