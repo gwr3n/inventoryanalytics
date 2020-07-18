@@ -112,13 +112,10 @@ class memoize(object):
     """
 
     def __init__(self, func): 
-        self.func = func 
-        self.memoized = {} 
-        self.method_cache = {} 
+        self.func, self.memoized, self.method_cache = func, {}, {}
 
     def __call__(self, *args): 
-        return self.cache_get(self.memoized, args, 
-            lambda: self.func(*args)) 
+        return self.cache_get(self.memoized, args, lambda: self.func(*args)) 
 
     def __get__(self, obj, objtype): 
         return self.cache_get(self.method_cache, obj, 
@@ -132,8 +129,7 @@ class memoize(object):
             return cache[key] 
     
     def reset(self):
-        self.memoized = {} 
-        self.method_cache = {} 
+        self.memoized, self.method_cache = {}, {}
 
 class State:
     """
@@ -255,7 +251,7 @@ class CapacitatedLotSizingSDP(CapacitatedLotSizing):
         self.cache_actions[str(s)]=q[0] if bool(q) else None                    # store an action in dictionary
         return v                                                                # return expected total cost
 
-    def order_quantities(self) -> List[float]:
+    def _compute_order_quantities(self) -> List[float]:
         '''
         Compute optimal capacitated lot sizing order quantities
         '''
@@ -264,6 +260,9 @@ class CapacitatedLotSizingSDP(CapacitatedLotSizing):
             Q = self.q(t, I)
             I += Q - self.d[t]
             yield Q
+
+    def order_quantities(self) -> List[float]:
+        return [Q for Q in self._compute_order_quantities()]
     
     def optimal_cost(self) -> float:
         '''

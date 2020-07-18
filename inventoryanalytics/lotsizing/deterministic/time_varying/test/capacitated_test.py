@@ -28,7 +28,7 @@ class TestCapacitatedLotSizing(unittest.TestCase):
     def test_order_quantities(self):
         for e in zip(self.cplex.order_quantities(), [10,30,30,30]):
             self.assertAlmostEqual(e[0],e[1])
-        for e in zip([Q for Q in self.sdp.order_quantities()], [10,30,30,30]):
+        for e in zip(self.sdp.order_quantities(), [10,30,30,30]):
             self.assertAlmostEqual(e[0],e[1])
 
 if __name__ == '__main__':
