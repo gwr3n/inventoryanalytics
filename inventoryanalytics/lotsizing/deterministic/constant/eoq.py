@@ -614,6 +614,24 @@ class epq:
         return h*Q*(1-rho)/2
 
     @staticmethod
+    def _plot_epq():
+        instance = {"K": 100, "h": 1, "d": 10, "v": 2, "p": 5}
+        pb = epq(**instance)
+        total, = plt.plot([k for k in range(10,100)], 
+                          [pb.relevant_cost(k) for k in range(10,100)], 
+                          label='Total relevant cost')
+        ordering, = plt.plot([k for k in range(10,100)], 
+                             [pb.co_fixed(k) for k in range(10,100)], 
+                             label='Ordering cost')
+        holding, = plt.plot([k for k in range(10,100)], 
+                            [pb.ch(k) for k in range(10,100)], 
+                            label='Holding cost')
+        plt.legend(handles=[total,ordering,holding], loc=1)
+        plt.ylabel('Cost')
+        plt.xlabel('Q')
+        plt.show()
+
+    @staticmethod
     def _sample_instance():
         instance = {"K": 100, "h": 1, "d": 10, "v": 2, "p": 5}
         #instance = {"K": 8, "h": 0.3*0.75, "d": 1300, "v": 75, "p": 5}
@@ -635,4 +653,5 @@ if __name__ == '__main__':
     #eoq_all_units_discounts._print_unit_cost()
     #eoq_all_units_discounts._print_total_cost()
     #eoq_incremental_discounts._print_unit_cost()
-    eoq_incremental_discounts._print_total_cost()
+    #eoq_incremental_discounts._print_total_cost()
+    epq._plot_epq()
