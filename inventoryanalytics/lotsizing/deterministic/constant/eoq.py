@@ -520,7 +520,7 @@ class eoq_planned_backorders:
 class epq:
     def __init__(self, K: float, h: float, d: float, v: float, p: float):
         """
-        Constructs an instance of the Economic Order Quantity problem.
+        Constructs an instance of the Economic Production Quantity problem.
         
         Arguments:
             K {float} -- the fixed ordering cost
@@ -532,18 +532,24 @@ class epq:
 
         self.K, self.h, self.d, self.v, self.p = K, h, d, v, p
 
-    def compute_eoq(self) -> float:
-        """
-        Computes the Economic Order Quantity.
-        
-        Returns:
-            float -- the Economic Order Quantity
-        """
-
-        x0 = 1 # start from a positive EOQ
+    def _compute_epq_nelder_mead(self) -> float:
+        x0 = 1 # start from a positive EPQ
         res = minimize(self.relevant_cost, x0, method='nelder-mead', 
                        options={'xtol': 1e-8, 'disp': False})
         return res.x[0]
+    
+    def _compute_epq_closed_form(self) -> float:
+        rho = self.p/self.d
+        return np.sqrt(2*self.K*self.d/(self.h*(1-rho)))
+
+    def compute_epq(self) -> float:
+        """
+        Computes the Economic Production Quantity.
+        
+        Returns:
+            float -- the Economic Production Quantity
+        """
+        return self._compute_epq_nelder_mead()
 
     def relevant_cost(self, Q: float) -> float:
         """
@@ -558,6 +564,10 @@ class epq:
         """
 
         return self.co_fixed(Q)+self.ch(Q)
+
+    def _optimal_relevant_cost_closed_form(self):
+        rho = self.p/self.d
+        print(np.sqrt(2*self.K*self.d*(self.h*(1-rho))))
 
     def cost(self, Q: float) -> float:
         """
@@ -636,11 +646,10 @@ class epq:
         instance = {"K": 100, "h": 1, "d": 10, "v": 2, "p": 5}
         #instance = {"K": 8, "h": 0.3*0.75, "d": 1300, "v": 75, "p": 5}
         pb = epq(**instance)
-        Qopt = pb.compute_eoq()
-        print(Qopt)
-        rho = pb.p/pb.d
-        print(np.sqrt(2*pb.K*pb.d/(pb.h*(1-rho))))
-        print(np.sqrt(2*pb.K*pb.d*(pb.h*(1-rho))))
+        print(pb.compute_epq())
+        print(pb._compute_epq_closed_form())
+        print(pb.relevant_cost(pb.compute_epq()))
+        print(pb._optimal_relevant_cost_closed_form())
 
 if __name__ == '__main__':
     #eoq._plot_eoq()

@@ -107,14 +107,14 @@ class TestEPQ(unittest.TestCase):
 
     def setUp(self):
         instance = {"K": 8, "h": 0.3*0.75, "d": 1300, "v": 75, "p": 5}
-        self.eoq = eoq.epq(**instance)
+        self.epq = eoq.epq(**instance)
 
     def tearDown(self):
         pass
 
     def test_epq(self):
-        K, h, d, p = self.eoq.K, self.eoq.h, self.eoq.d, self.eoq.p
+        K, h, d, p = self.epq.K, self.epq.h, self.epq.d, self.epq.p
         rho = p/d
-        self.assertAlmostEqual(self.eoq.compute_eoq(), 
+        self.assertAlmostEqual(self.epq.compute_epq(), 
                                np.sqrt(2*K*d/(h*(1-rho))), 
                                places=2) # closed-form
