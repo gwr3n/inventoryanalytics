@@ -104,7 +104,7 @@ class els:
         plt.ylabel('Cost')
         plt.xlabel('T')
         x = [100,150,200,250,300]
-        xNew = [1,15,2,2.5,30]
+        xNew = [1,1.5,2,2.5,3]
         plt.xticks(x, xNew)
         plt.show()
 
