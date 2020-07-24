@@ -120,5 +120,5 @@ class els:
             print("T["+str(i)+"] = "+str(pb.compute_production_cycle_length(Topt,i)))
         
 if __name__ == '__main__':
-    els._plot_els()
-    # els._sample_instance()
+    # els._plot_els()
+    els._sample_instance()
