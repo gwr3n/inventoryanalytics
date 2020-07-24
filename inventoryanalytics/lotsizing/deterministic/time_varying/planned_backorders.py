@@ -79,15 +79,15 @@ class WagnerWhitinPlannedBackordersCPLEX(WagnerWhitinPlannedBackorders):
             print("Solve status: " + self.msol.get_solve_status() + "\n")
         
     def order_quantities(self) -> List[float]:
-        '''
+        """
         Compute optimal Wagner-Whitin order quantities
-        '''
+        """
         return [self.msol.get_var_value(self.Q[t]) for t in range(0,len(self.d))]
     
     def optimal_cost(self) -> float:
-        '''
+        """
         Compute the cost of an optimal solution to the Wagner-Whitin problem
-        '''
+        """
         return self.msol.get_objective_value()    
 
     @staticmethod
