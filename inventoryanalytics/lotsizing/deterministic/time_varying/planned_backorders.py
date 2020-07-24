@@ -46,22 +46,6 @@ class WagnerWhitinPlannedBackordersCPLEX(WagnerWhitinPlannedBackorders):
     """
     Solves the Wagner-Whitin problem as an MILP.
     """
-
-    def __init__(self, K: float, v: float, h: float, p: float, d: List[float], I0: float = 0):
-        """
-        Create an instance of a Wagner-Whitin problem.
-
-        Arguments:
-            K {float} -- the fixed ordering cost
-            v {float} -- the per unit ordering cost
-            h {float} -- the per unit holding cost
-            p {float} -- the per unit backorder cost
-            d {List[float]} -- the demand in each period
-            I0 {float} -- the initial inventory level
-        """
-        super().__init__(K, v, h, p, d, I0)
-        self.model()
-
     def model(self):
         """
         Model and solve the Wagner Whitin problem via CPLEX
@@ -110,6 +94,7 @@ class WagnerWhitinPlannedBackordersCPLEX(WagnerWhitinPlannedBackorders):
     def _test():
         instance = {"K": 40, "v": 1, "h": 1, "p": 2, "d":[10,20,30,40], "I0": 0}
         ww = WagnerWhitinPlannedBackordersCPLEX(**instance)
+        ww.model()
 
 if __name__ == '__main__':
     WagnerWhitinPlannedBackordersCPLEX._test()

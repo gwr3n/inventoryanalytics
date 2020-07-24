@@ -16,6 +16,7 @@ class TestWagnerWhitinPlannedBackorders(unittest.TestCase):
     def setUp(self):
         instance = {"K": 40, "v": 1, "h": 1, "p": 2, "d":[10,20,30,40], "I0": 0}
         self.ww_cplex = ww.WagnerWhitinPlannedBackordersCPLEX(**instance)
+        self.ww_cplex.model()
 
     def tearDown(self):
         pass
