@@ -2,33 +2,42 @@ import statistics, scipy.stats as stats, statsmodels.api as sm
 import numpy as np, pandas as pd
 import matplotlib.pyplot as plt, pylab as py  
 
-def sample_random_walk(X0, realisations):
+def sample_random_walk(X0, c, realisations):
     np.random.seed(1234)
     errors = np.random.normal(0, 1, realisations)
     Xt = X0
     for e in errors:
-        Xt = Xt + e
+        Xt = c + Xt + e
         yield Xt
 
-def naive(series, t):
+def drift(series, t):
     """Forecasts periods t+1, t+2, ... of series
     """
-    forecasts = np.empty(len(series))
-    forecasts[:t+1] = np.nan
-    forecasts[t+1:] = series['xt'][t]
+    forecasts = np.empty(t+1)
+    forecasts.fill(np.nan)
+    x1 = series['xt'][0]
+    xt = series['xt'][t]
+    for k in range(1,len(series)-t):
+        xtk = xt+k*(xt-x1)/t
+        forecasts = np.append(forecasts, xtk)
     return forecasts
 
-def naive_rolling(series):
-    return series.shift(periods=1)
+def drift_rolling(series):
+    forecasts = np.empty(2)
+    forecasts.fill(np.nan)
+    for k in range(1,len(series)-1):
+        xk = drift(series[:k+2], k)[-1]
+        forecasts = np.append(forecasts, xk)
+    return forecasts
 
 def plot(realisations, forecasts):
     f = plt.figure(1)
-    plt.title("Naïve method")
+    plt.title("Drift method")
     plt.xlabel('Period')
     plt.ylabel('xt')
     first, last = next(x for x, val in enumerate(forecasts) if ~np.isnan(val)), len(forecasts)-1
     plt.axvspan(first, last, alpha=0.2, color='blue')
-    plt.plot(forecasts, "r", label="Naïve forecasts")
+    plt.plot(forecasts, "r", label="Drift forecasts")
     plt.plot(realisations, "b", label="Actual values")
     plt.legend(loc="upper left")
     plt.grid(True)
@@ -64,11 +73,11 @@ def residuals_autocorrelation(residuals, window):
     plt.acorr(residuals, maxlags=window)
     f.show()
 
-N, t, window = 200, 160, 1
-realisations = pd.DataFrame({'xt' : list(sample_random_walk(0, 200))}, columns = ['xt'], index=range(200))
-forecasts = naive(realisations, t)
+N, t, window = 200, 160, 2
+realisations = pd.DataFrame({'xt' : list(sample_random_walk(0, 0.1, N))}, columns = ['xt'], index=range(N))
+forecasts = drift(realisations, t)
 plot(realisations, forecasts) 
-forecasts = naive_rolling(realisations)
+forecasts = pd.DataFrame({'xt' : list(drift_rolling(realisations))}, columns = ['xt'], index=range(N))
 residuals = residuals(realisations[window:]['xt'], forecasts[window:]['xt'])
 print("E[e_t] = "+str(statistics.mean(residuals)))
 print("Stdev[e_t] = "+str(statistics.stdev(residuals)))

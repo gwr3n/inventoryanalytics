@@ -6,30 +6,31 @@
 #def mean_absolute_percentage_error(y_true, y_pred): 
 #    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
-import math
-import statistics
-import numpy as np
-import pandas as pd
-import scipy.stats as stats
-
-import matplotlib.pyplot as plt                  
+import statistics, scipy.stats as stats, statsmodels.api as sm
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt, pylab as py                  
 
 # plot_moving_average
 from sklearn.metrics import mean_absolute_error
 from scipy.stats import t
 
-# Q-Q plot
-import statsmodels.api as sm 
-import pylab as py 
-
 def sample_gaussian_process(mu, sigma, realisations):
     np.random.seed(1234)
     return np.random.normal(mu, sigma, realisations)
 
-def moving_average(series, n):
+def moving_average(series, w, t):
+    """Forecasts elements t+1, t+2, ... of series
+    """
+    forecasts = np.empty(t+1)
+    forecasts.fill(np.nan)
+    for k in range(1,len(series)-t):
+        forecasts = np.append(forecasts, series[t+1-w:t+1].mean()['xt'])
+    return forecasts
+
+def moving_average_rolling(series, w):
     """Calculate rolling average of last n realisations
     """
-    return series.rolling(window=n).mean()
+    return series.rolling(window=w).mean()
 
 def plot_moving_average(series, window, plot_intervals=False, confidence=0.95, plot_anomalies=False):
     """
@@ -42,11 +43,11 @@ def plot_moving_average(series, window, plot_intervals=False, confidence=0.95, p
     f = plt.figure(1)
     scale = t.ppf(confidence, len(series) - window - 1, loc=0, scale=1)
 
-    rolling_mean = moving_average(series, window)
+    rolling_mean = moving_average_rolling(series, window)
 
     plt.title("Moving average\n window size = {}".format(window))
     plt.xlabel('Period')
-    plt.ylabel('Value')
+    plt.ylabel('xt')
     plt.plot(rolling_mean, "g", label="Rolling mean trend")
 
     # Plot confidence intervals for smoothed values
@@ -72,11 +73,13 @@ def plot_moving_average(series, window, plot_intervals=False, confidence=0.95, p
 
 def plot(realisations, forecasts, window):
     f = plt.figure(1)
-    plt.title("Moving average\n window size = {}".format(window))
+    plt.title("Moving Average forecasts\n window size = {}".format(window))
     plt.xlabel('Period')
-    plt.ylabel('Value')
-    plt.plot(forecasts, "g", label="Rolling mean trend")
-    plt.plot(realisations[window:], label="Actual values")
+    plt.ylabel('xt')
+    first, last = next(x for x, val in enumerate(forecasts) if ~np.isnan(val)), len(forecasts)-1
+    plt.axvspan(first, last, alpha=0.2, color='blue')
+    plt.plot(forecasts, "g", label="Moving Average forecasts")
+    plt.plot(realisations, label="Actual values")
     plt.legend(loc="upper left")
     plt.grid(True)
     f.show()
@@ -91,7 +94,7 @@ def standardised_residuals(realisations, forecasts):
 def residuals_plot(residuals):
     f = plt.figure(2)
     plt.xlabel('Period')
-    plt.ylabel('Value')
+    plt.ylabel('xt')
     plt.plot(residuals, "g", label="Residuals")
     plt.grid(True)
     f.show()
@@ -99,7 +102,7 @@ def residuals_plot(residuals):
 def residuals_histogram(residuals):
     f = plt.figure(3)
     plt.xlabel('Period')
-    plt.ylabel('Value')
+    plt.ylabel('xt')
     num_bins = 30
     plt.hist(residuals, num_bins, facecolor='blue', alpha=0.5, density=True)
     x = np.linspace(-3, 3, 100)
@@ -111,14 +114,15 @@ def residuals_autocorrelation(residuals, window):
     plt.acorr(residuals, maxlags=window)
     f.show()
 
-window = 32
-realisations = pd.DataFrame({'Value' : sample_gaussian_process(20, 5, 200)}, columns = ['Value'], index=range(200))
-forecasts = moving_average(realisations, window)
+N, t, window = 200, 160, 32
+realisations = pd.DataFrame({'xt' : sample_gaussian_process(20, 5, N)}, columns = ['xt'], index=range(N))
+forecasts = moving_average(realisations, window, t)
 plot(realisations, forecasts, window) 
-residuals = residuals(realisations[window:]['Value'], forecasts[window:]['Value'])
+forecasts = moving_average_rolling(realisations, window)
+residuals = residuals(realisations[window:]['xt'], forecasts[window:]['xt'])
 print("E[e_t] = "+str(statistics.mean(residuals)))
 print("Stdev[e_t] = "+str(statistics.stdev(residuals)))
-standardised_residuals = standardised_residuals(realisations[window:]['Value'], forecasts[window:]['Value'])
+standardised_residuals = standardised_residuals(realisations[window:]['xt'], forecasts[window:]['xt'])
 residuals_plot(residuals)
 residuals_histogram(standardised_residuals)
 residuals_autocorrelation(residuals, None)
