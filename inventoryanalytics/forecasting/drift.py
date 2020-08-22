@@ -25,8 +25,8 @@ def drift(series, t):
 def drift_rolling(series):
     forecasts = np.empty(2)
     forecasts.fill(np.nan)
-    for k in range(1,len(series)-1):
-        xk = drift(series[:k+2], k)[-1]
+    for k in range(2,len(series)):
+        xk = drift(series[:k+1], k-1)[-1]
         forecasts = np.append(forecasts, xk)
     return forecasts
 
