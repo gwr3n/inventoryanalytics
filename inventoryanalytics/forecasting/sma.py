@@ -6,7 +6,7 @@
 #def mean_absolute_percentage_error(y_true, y_pred): 
 #    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
-import statistics, scipy.stats as stats, statsmodels.api as sm
+import math, statistics, scipy.stats as stats, statsmodels.api as sm
 import numpy as np, pandas as pd
 import matplotlib.pyplot as plt, pylab as py                  
 
