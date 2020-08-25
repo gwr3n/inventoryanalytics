@@ -16,7 +16,7 @@ def seasonal_naive(series, m, t):
     forecasts = np.empty(len(series))
     forecasts[:t+1] = np.nan
     for k in range(t+1,len(series)):
-        forecasts[k] = series['xt'][k-m]
+        forecasts[k] = series[k-m]
     return forecasts
 
 def seasonal_naive_rolling(series, m):
@@ -31,7 +31,6 @@ def plot(realisations, forecasts):
     f = plt.figure(1)
     plt.title("Seasonal naive method")
     plt.xlabel('Period')
-    plt.ylabel('xt')
     first, last = next(x for x, val in enumerate(forecasts) if ~np.isnan(val)), len(forecasts)-1
     plt.axvspan(first, last, alpha=0.2, color='blue')
     plt.plot(forecasts, "r", label="Seasonal naive forecasts")
@@ -50,7 +49,6 @@ def standardised_residuals(realisations, forecasts):
 def residuals_plot(residuals):
     f = plt.figure(2)
     plt.xlabel('Period')
-    plt.ylabel('xt')
     plt.plot(residuals, "g", label="Residuals")
     plt.grid(True)
     f.show()
@@ -58,7 +56,6 @@ def residuals_plot(residuals):
 def residuals_histogram(residuals):
     f = plt.figure(3)
     plt.xlabel('Period')
-    plt.ylabel('xt')
     num_bins = 30
     plt.hist(residuals, num_bins, facecolor='blue', alpha=0.5, density=True)
     x = np.linspace(-3, 3, 100)
@@ -71,14 +68,14 @@ def residuals_autocorrelation(residuals, window):
     f.show()
 
 N, t, window = 100, 80, 5
-realisations = pd.DataFrame({'xt' : list(sample_seasonal_random_walk(N, window))}, columns = ['xt'], index=range(N))
+realisations = pd.Series(list(sample_seasonal_random_walk(N, window)), range(N))
 forecasts = seasonal_naive(realisations, window, t)
 plot(realisations, forecasts) 
-forecasts = pd.DataFrame({'xt' : list(seasonal_naive_rolling(realisations, window))}, columns = ['xt'], index=range(N))
-residuals = residuals(realisations[window:]['xt'], forecasts[window:]['xt'])
+forecasts = pd.Series(list(seasonal_naive_rolling(realisations, window)), range(N))
+residuals = residuals(realisations[window:], forecasts[window:])
 print("E[e_t] = "+str(statistics.mean(residuals)))
 print("Stdev[e_t] = "+str(statistics.stdev(residuals)))
-standardised_residuals = standardised_residuals(realisations[window:]['xt'], forecasts[window:]['xt'])
+standardised_residuals = standardised_residuals(realisations[window:], forecasts[window:])
 residuals_plot(residuals)
 residuals_histogram(standardised_residuals)
 residuals_autocorrelation(residuals, None)
