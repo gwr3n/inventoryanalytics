@@ -67,15 +67,15 @@ def residuals_autocorrelation(residuals, window):
     plt.acorr(residuals, maxlags=window)
     f.show()
 
-N, t, window = 100, 80, 5
-realisations = pd.Series(list(sample_seasonal_random_walk(N, window)), range(N))
-forecasts = seasonal_naive(realisations, window, t)
+N, t, m = 100, 80, 5
+realisations = pd.Series(list(sample_seasonal_random_walk(N, m)), range(N))
+forecasts = seasonal_naive(realisations, m, t)
 plot(realisations, forecasts) 
-forecasts = pd.Series(list(seasonal_naive_rolling(realisations, window)), range(N))
-residuals = residuals(realisations[window:], forecasts[window:])
+forecasts = pd.Series(list(seasonal_naive_rolling(realisations, m)), range(N))
+residuals = residuals(realisations[m:], forecasts[m:])
 print("E[e_t] = "+str(statistics.mean(residuals)))
 print("Stdev[e_t] = "+str(statistics.stdev(residuals)))
-standardised_residuals = standardised_residuals(realisations[window:], forecasts[window:])
+standardised_residuals = standardised_residuals(realisations[m:], forecasts[m:])
 residuals_plot(residuals)
 residuals_histogram(standardised_residuals)
 residuals_autocorrelation(residuals, None)
