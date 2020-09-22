@@ -247,7 +247,7 @@ class StochasticLotSizing:
         self.cache_actions[str(s)]=q[0] if bool(q) else None                    # store an action in dictionary
         return v                                                                # return expected total cost
 
-    def extract_sS_policy(self) -> List[float]:
+    def extract_skSk_policy(self) -> List[float]:
         """
         Extract optimal (sk,Sk) policy parameters
         
@@ -396,7 +396,7 @@ if __name__ == '__main__':
     # Extract [sk,Sk] Policy 
     print()
     print("****** [sk,Sk] Policy *****")
-    skSk_policy = lot_sizing_order.extract_sS_policy()   
+    skSk_policy = lot_sizing_order.extract_skSk_policy()   
     period = 1
     for i in range(len(skSk_policy)):
         print("Period: "+str(i)+"\n[sk,Sk]")
