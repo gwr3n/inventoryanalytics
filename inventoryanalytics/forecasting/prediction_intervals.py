@@ -79,7 +79,7 @@ def naive_rolling(series):
 def residuals(realisations, forecasts):
     return realisations - forecasts
 
-def plot(realisations, forecasts, stdev):
+def plot(realisations, forecasts, stdev, alpha):
     f = plt.figure(1)
     plt.title("Naïve method")
     plt.xlabel('Period')
@@ -87,21 +87,22 @@ def plot(realisations, forecasts, stdev):
     plt.axvspan(first, last, alpha=0.2, color='blue')
     plt.plot(forecasts, "r", label="Naïve forecasts")
     plt.plot(realisations, "b", label="Actual values")
+    z = t.ppf(1-(1-alpha)/2, len(realisations)-1) # inverse t distribution
     plt.fill_between(range(first, last+1), 
-                     [forecasts[first+k]-stdev*math.sqrt(k) for k in range(last-first+1)], 
-                     [forecasts[first+k]+stdev*math.sqrt(k) for k in range(last-first+1)],
+                     [forecasts[first+k]-z*stdev*math.sqrt(k) for k in range(last-first+1)], 
+                     [forecasts[first+k]+z*stdev*math.sqrt(k) for k in range(last-first+1)],
                      color='r', alpha=0.1)
     plt.legend(loc="upper left")
     plt.grid(True)
     f.show()
 
 def prediction_intervals_naive():
-    N, t, window = 200, 160, 1
+    N, t, window, alpha = 200, 160, 1, 0.95
     realisations = pd.Series(list(sample_random_walk(0, N)), range(N))
     forecasts = naive(realisations, t)
     forecasts_roll = naive_rolling(realisations)
     res = residuals(realisations[window:], forecasts_roll[window:])
-    plot(realisations, forecasts, s.stdev(res)) 
+    plot(realisations, forecasts, s.stdev(res), alpha) 
     print("E[e_t] = "+str(s.mean(res)))
     print("Stdev[e_t] = "+str(s.stdev(res)))
     plt.show()
