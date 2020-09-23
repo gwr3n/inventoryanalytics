@@ -32,45 +32,6 @@ def moving_average_rolling(series, w):
     """
     return series.rolling(window=w).mean()
 
-# def plot_moving_average(series, window, plot_intervals=False, confidence=0.95, plot_anomalies=False):
-#     """
-#         series - dataframe with timeseries
-#         window - rolling window size 
-#         plot_intervals - show confidence intervals
-#         plot_anomalies - show anomalies 
-
-#     """
-#     f = plt.figure(1)
-#     scale = t.ppf(confidence, len(series) - window - 1, loc=0, scale=1)
-
-#     rolling_mean = moving_average_rolling(series, window)
-
-#     plt.title("Moving average\n window size = {}".format(window))
-#     plt.xlabel('Period')
-#     plt.ylabel('xt')
-#     plt.plot(rolling_mean, "g", label="Rolling mean trend")
-
-#     # Plot confidence intervals for smoothed values
-#     if plot_intervals:
-#         mae = mean_absolute_error(series[window:], rolling_mean[window:])
-#         deviation = np.std(series[window:] - rolling_mean[window:])
-#         lower_bond = rolling_mean - (mae + scale * deviation * math.sqrt(1+1/(len(series) - window)))
-#         upper_bond = rolling_mean + (mae + scale * deviation * math.sqrt(1+1/(len(series) - window)))
-#         plt.plot(upper_bond, "r--", label="Upper Bond / Lower Bond")
-#         plt.plot(lower_bond, "r--")
-        
-#         # Having the intervals, find abnormal values
-#         if plot_anomalies:
-#             anomalies = pd.DataFrame(index=series.index, columns=series.columns)
-#             anomalies[series<lower_bond] = series[series<lower_bond]
-#             anomalies[series>upper_bond] = series[series>upper_bond]
-#             plt.plot(anomalies, "ro", markersize=10)
-        
-#     plt.plot(series[window:], label="Actual values")
-#     plt.legend(loc="upper left")
-#     plt.grid(True)
-#     f.show()
-
 def plot(realisations, forecasts, window):
     f = plt.figure(1)
     plt.title("Moving Average forecasts\n window size = {}".format(window))
