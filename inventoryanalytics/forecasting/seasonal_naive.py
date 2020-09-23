@@ -16,7 +16,7 @@ def seasonal_naive(series, m, t):
     forecasts = np.empty(len(series))
     forecasts[:t+1] = np.nan
     for k in range(t+1,len(series)):
-        forecasts[k] = series[k-m]
+        forecasts[k] = series[k-m*((k-t-1)//m+1)]
     return forecasts
 
 def seasonal_naive_rolling(series, m):
