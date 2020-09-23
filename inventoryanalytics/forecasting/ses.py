@@ -117,10 +117,12 @@ def plot_ci(realisations, forecasts, forecasts_ci, alpha):
     f.show()
 
 def simple_exponential_smoothing_ci(stochastic_process):
-    N, t, alpha, x0 = 200, 160, 0.5, 20
+    N, t, alpha = 200, 160, 0.5
     if stochastic_process == "GP":
+        x0 = 20
         realisations = pd.Series(sample_gaussian_process(20, 5, N), range(N))
     elif stochastic_process == "RW":
+        x0 = 0
         realisations = pd.Series(list(sample_random_walk(0, N)), range(N))
     else:
         quit()
