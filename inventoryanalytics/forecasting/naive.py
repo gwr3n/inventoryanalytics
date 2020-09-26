@@ -2,6 +2,8 @@ import statistics, scipy.stats as stats, statsmodels.api as sm
 import numpy as np, pandas as pd
 import matplotlib.pyplot as plt, pylab as py  
 
+from statsmodels.tsa.arima_process import ArmaProcess
+
 def sample_random_walk(X0, realisations):
     np.random.seed(1234)
     errors = np.random.normal(0, 1, realisations)
@@ -9,6 +11,18 @@ def sample_random_walk(X0, realisations):
     for e in errors:
         Xt = Xt + e
         yield Xt
+
+# ARMA(1,0) random walk
+def sample_random_walk_arma(X0, realisations):
+    np.random.seed(1234)
+    # ARMA(1,1)
+    arparams = np.array([1])
+    maparams = np.array([0])
+    # include zero-th lag
+    arparams = np.r_[1, -arparams]
+    maparams = np.r_[1, maparams]
+    arma_t = ArmaProcess(arparams, maparams)
+    return arma_t.generate_sample(nsample=realisations)       
 
 def naive(series, t):
     """Forecasts periods t+1, t+2, ... of series
