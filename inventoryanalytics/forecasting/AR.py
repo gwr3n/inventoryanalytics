@@ -39,8 +39,7 @@ def fit_AR_p():
     print("Std residuals: "+str(statistics.stdev(res.resid)))
 
     f = plt.figure(1)
-    fig = plt.figure(figsize=(16,9))
-    res.plot_diagnostics(fig=fig, lags=30)
+    res.plot_diagnostics(fig=f, lags=30)
     f.show()
 
     f = plt.figure(1)
