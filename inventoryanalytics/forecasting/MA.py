@@ -1,4 +1,4 @@
-import numpy as np, pandas as pd
+import numpy as np, pandas as pd, statistics
 import matplotlib.pyplot as plt
 from statsmodels.tsa.arima_process import ArmaProcess
 import statsmodels.api as sm
@@ -50,6 +50,7 @@ def fit_MA_q():
     mod = sm.tsa.ARMA(realisations[0:t], order=(0, 2))
     res = mod.fit()
     print(res.summary())
+    print("Std residuals: "+str(statistics.stdev(res.resid)))
     
     sm.graphics.tsa.plot_acf(realisations.values.squeeze(), lags=max_order)
 
