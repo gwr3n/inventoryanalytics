@@ -14,7 +14,7 @@ def plot_inventory(values, label):
                range(1,len(values)+1))
     plt.xlabel("t")
     plt.ylabel("items")
-    plt.plot( 'x', 'fx', data=df, linestyle='-', marker='o', label=label)
+    plt.plot( 'x', 'fx', data=df, linestyle='-', marker='', label=label)
 
 #########################
 ##         DES         ##
