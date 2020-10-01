@@ -161,9 +161,9 @@ def simulate_newsvendor():
     des.start()
 
     print("Period costs: "+str([w.period_costs[e] for e in w.period_costs]))
-    print("Average cost per period: "+ '%.2f' % (sum([w.period_costs[e] for e in w.period_costs])/len(w.period_costs)))
+    print("Total cost: "+ '%.2f' % (sum([w.period_costs[e] for e in w.period_costs])))
 
-    return sum([w.period_costs[e] for e in w.period_costs])/len(w.period_costs)
+    return sum([w.period_costs[e] for e in w.period_costs])
 
 np.random.seed(1234)
 replications = 1000
