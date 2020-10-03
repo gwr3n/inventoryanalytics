@@ -7,8 +7,8 @@ from statsmodels.tsa.statespace.tools import diff
 from statsmodels.tsa.arima_model import ARIMA
 
 def differencing():
-    ticker = yf.Ticker("AMZN")
-    hist = ticker.history(start="2020-07-01", end="2020-10-1")
+    ticker = yf.Ticker("V")
+    hist = ticker.history(start="2020-09-01", end="2020-10-3")
     ts = pd.Series(hist["Close"])
     differenced = diff(ts, k_diff=1)
     res = differenced/statistics.stdev(differenced)
@@ -18,8 +18,8 @@ def differencing():
     plt.show()
 
 def predict():
-    ticker = yf.Ticker("AMZN")
-    hist = ticker.history(start="2020-07-01", end="2020-10-1")
+    ticker = yf.Ticker("V")
+    hist = ticker.history(start="2020-09-01", end="2020-10-3")
     N, t, w = len(hist), len(hist), 7
     ts = pd.Series(hist["Close"])
     ts = ts.astype(float)
