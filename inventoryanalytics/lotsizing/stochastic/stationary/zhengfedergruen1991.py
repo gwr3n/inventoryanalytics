@@ -100,3 +100,10 @@ class ZhengFedergruen(object):
         self.s_star = s
         self.S_star = S0
         return s, S0
+
+    @staticmethod
+    def run_instance():
+        instance = {'mu': 10, 'K': 64, 'h': 1., 'b': 9.}
+        pb = ZhengFedergruen(**instance)
+        print(pb.findOptimalPolicy())
+    
