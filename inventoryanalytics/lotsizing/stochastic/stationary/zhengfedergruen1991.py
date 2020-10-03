@@ -17,7 +17,7 @@ def expectation(f, x, p): # E f(X) = sum f(x_i) p_i
     return np.dot(f(x),p)
 
 class ZhengFedergruen(object):
-    """[summary]
+    """
     The stationary stochastic lot sizing problem.
 
     Zheng, Y., & Federgruen, A. (1991). Finding optimal (s, s) policies is about
