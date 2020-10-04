@@ -126,8 +126,7 @@ class InventoryReview:
         self.s, self.S = s, S # the reorder point and the order-up-to-level
         self.w = warehouse # the warehouse
         self.des = des # the Discrete Event Simulation engine
-        self.lead_time = lead_time
-        self.B = B
+        self.lead_time, self.B = lead_time, B
         self.priority = 1 # denotes a medium priority
 
     def end(self):
@@ -135,7 +134,7 @@ class InventoryReview:
             Q = min(self.S - self.w.inventory_position(), self.B)
             self.w.order(Q, self.des.time)
             self.des.schedule(EventWrapper(ReceiveOrder(self.des, Q, self.w)), self.lead_time)
-        des.schedule(EventWrapper(self), 1)
+        des.schedule(EventWrapper(self), 1) # schedule another review in 1 period
         
 class ReceiveOrder:
     def __init__(self, des: DES, Q: float, warehouse: Warehouse):
