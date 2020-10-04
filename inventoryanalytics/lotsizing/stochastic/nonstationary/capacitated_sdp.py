@@ -368,16 +368,16 @@ if __name__ == '__main__':
                  [lot_sizing_no_order.f(k) 
                  for k in range(*plot_domain)], label='G(y)')
     
-        plt.plot([k for k in range(*plot_domain)],              # Plot C(y)
+        plt.plot([k for k in range(*plot_domain)],              # Plot C(x)
                  [lot_sizing_order.f(k) 
-                 for k in range(*plot_domain)], label='C(y)')
+                 for k in range(*plot_domain)], label='C(x)')
     
         plt.plot([k for k in range(*plot_domain)],              # Plot C(y)-G(y)
                  [lot_sizing_order.f(k) - lot_sizing_no_order.f(k) 
                  for k in range(*plot_domain)], label='C(y)-G(y)')
 
         plt.scatter([k for k in range(*plot_domain)],           #Plot Q
-                    [lot_sizing_order.q(0,k) for k in range(*plot_domain)], s=2, label='Q')
+                    [lot_sizing_order.q(0,k) for k in range(*plot_domain)], s=2, label='Q', color='red')
     
     if printFunctions: 
         print("G(y) = "+str(list(zip([k for k in range(*plot_domain)],        # Print G(y)
