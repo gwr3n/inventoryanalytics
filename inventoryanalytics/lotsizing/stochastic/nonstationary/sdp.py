@@ -181,7 +181,7 @@ class StochasticLotSizing:
 
     @staticmethod
     def run_instance_stationary():
-        instance = {"K": 64, "v": 0, "h": 1, "p": 9, "d": [20,20,20,20], 
+        instance = {"K": 64, "v": 0, "h": 1, "p": 9, "d": [10,10,10,10,10,10,10], 
                     "max_inv": 200, "q": 0.9999, "initial_order": True}
         lot_sizing = StochasticLotSizing(**instance)
         print(lot_sizing.extract_sS_policy())
