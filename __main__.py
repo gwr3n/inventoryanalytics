@@ -1,3 +1,3 @@
-import inventoryanalytics.lotsizing.stochastic.stationary.zhengfedergruen1991 as zf
+import inventoryanalytics.lotsizing.stochastic.nonstationary.sdp as sdp
 
-zf.ZhengFedergruen.run_instance()
+sdp.StochasticLotSizing.run_instance()
