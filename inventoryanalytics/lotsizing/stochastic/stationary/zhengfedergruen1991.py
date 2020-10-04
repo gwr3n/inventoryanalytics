@@ -13,6 +13,8 @@ import functools
 from scipy.stats import poisson
 from inventoryanalytics.utils import memoize as mem
 
+import matplotlib.pyplot as plt
+
 def expectation(f, x, p): # E f(X) = sum f(x_i) p_i
     return np.dot(f(x),p)
 
@@ -42,6 +44,7 @@ class ZhengFedergruen(object):
         self.p = poisson.pmf(np.arange(200), self.mu)
         self.h = h
         self.b = b
+        self.execution_path = []
 
     def G_L(self, y): # the one-period inventory cost
         # see Page 655
@@ -83,23 +86,51 @@ class ZhengFedergruen(object):
         S_0 = ystar + 0 #lower bound for S_0
 
         #calculate the optimal s for S fixed at its lower bound S0
+        self.execution_path.append([s,S_0])
         while self.c(s,S_0) > self.G(s):
             s -= 1
+            self.execution_path.append([s,S_0])
         s_0 = s # + 0   #optimal value of s for S0
         c0 = self.c(s_0,S_0) #costs for this starting value
         S0 = S_0 # + 0  # S0 = S^0 of the paper
         S = S0+1
+        self.execution_path.append([s,S])
         while self.G(S) <= c0:
             if self.c(s,S) < c0:
                 S0 = S+0
                 while self.c(s,S0) <= self.G(s+1):
                     s += 1
+                    self.execution_path.append([s,S0])
                 c0 = self.c(s,S0)
+                self.execution_path.append([s,S])
             S += 1
-            #print(str(s) + " " + str(S))
+        #print(np.array(self.execution_path))
+        #self.plot()
         self.s_star = s
         self.S_star = S0
         return s, S0
+
+    def plot(self):
+        plt.plot(np.array(self.execution_path)[:,0],np.array(self.execution_path)[:,1],'b-')
+        plt.arrow(np.array(self.execution_path)[0,0],np.array(self.execution_path)[0,1],
+                           0.1*(np.array(self.execution_path)[1,0]-np.array(self.execution_path)[0,0]),
+                           0.1*(np.array(self.execution_path)[1,1]-np.array(self.execution_path)[0,1]), 
+                           lw=0.1, length_includes_head=False, head_width=0.7, head_length=0.3)
+        plt.arrow(np.array(self.execution_path)[10,0],np.array(self.execution_path)[10,1],
+                           0.1*(np.array(self.execution_path)[11,0]-np.array(self.execution_path)[10,0]),
+                           0.1*(np.array(self.execution_path)[11,1]-np.array(self.execution_path)[10,1]), 
+                           lw=0.5, length_includes_head=False, head_width=0.3, head_length=0.5)
+        plt.arrow(np.array(self.execution_path)[20,0],np.array(self.execution_path)[20,1],
+                           0.1*(np.array(self.execution_path)[21,0]-np.array(self.execution_path)[20,0]),
+                           0.1*(np.array(self.execution_path)[21,1]-np.array(self.execution_path)[20,1]), 
+                           lw=0.5, length_includes_head=False, head_width=0.3, head_length=0.5)
+        plt.arrow(np.array(self.execution_path)[30,0],np.array(self.execution_path)[30,1],
+                           0.1*(np.array(self.execution_path)[31,0]-np.array(self.execution_path)[30,0]),
+                           0.1*(np.array(self.execution_path)[31,1]-np.array(self.execution_path)[30,1]), 
+                           lw=0.5, length_includes_head=False, head_width=0.3, head_length=0.5)
+        plt.xlabel("s")
+        plt.ylabel("S")
+        plt.show()
 
     @staticmethod
     def run_instance():
