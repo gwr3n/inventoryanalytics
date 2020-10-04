@@ -156,7 +156,7 @@ des.schedule(EventWrapper(d), 0) # schedule a demand immediately
 
 lead_time = 0
 o = OrderUpTo(des, 13, w, lead_time)
-for t in range(5):
+for t in range(N):
     des.schedule(EventWrapper(o), t) # schedule orders
 des.schedule(EventWrapper(EndOfPeriod(des, w)), 1) # schedule EndOfPeriod at the end of the first period
 des.start()
