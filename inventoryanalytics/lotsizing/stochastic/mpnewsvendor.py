@@ -28,4 +28,5 @@ instance = {"o" : 1, "u": 5, "mean" : [10,10,10]}
 nb = MultiPeriodNewsvendor(instance)
 res = nb.optC()
 print(res)
+print("Optimal cost: "+str(res.fun))
 print("Verify critical fractile solution: "+str(nb.verify_fractile_solution(res.x[0])))
