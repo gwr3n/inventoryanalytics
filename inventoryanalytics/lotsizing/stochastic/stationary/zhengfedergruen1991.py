@@ -41,7 +41,7 @@ class ZhengFedergruen(object):
 
         self.K = K      
         self.mu = mu
-        self.p = poisson.pmf(np.arange(200), self.mu)
+        self.p = poisson.pmf(np.arange(10*mu), self.mu)
         self.h = h
         self.b = b
         self.execution_path = []
