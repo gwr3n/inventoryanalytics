@@ -134,7 +134,7 @@ class InventoryReview:
             Q = min(self.S - self.w.inventory_position(), self.B)
             self.w.order(Q, self.des.time)
             self.des.schedule(EventWrapper(ReceiveOrder(self.des, Q, self.w)), self.lead_time)
-        des.schedule(EventWrapper(self), 1) # schedule another review in 1 period
+        self.des.schedule(EventWrapper(self), 1) # schedule another review in 1 period
         
 class ReceiveOrder:
     def __init__(self, des: DES, Q: float, warehouse: Warehouse):
@@ -147,7 +147,7 @@ class ReceiveOrder:
         self.w.receive_order(self.Q, self.des.time)
 
 np.random.seed(1234)
-instance = {"inventory_level": 00, "fixed_ordering_cost": 64, "holding_cost": 1, "penalty_cost": 9}
+instance = {"inventory_level": 0, "fixed_ordering_cost": 64, "holding_cost": 1, "penalty_cost": 9}
 w = Warehouse(**instance)
 
 N = 20 # planning horizon length
