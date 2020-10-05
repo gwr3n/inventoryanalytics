@@ -96,7 +96,7 @@ class RS_DP(StochasticLotSizing):
             print("c("+str(path[t-1])+","+str(path[t]-1)+") = "+str(self.cycle_cost(path[t-1],path[t]-1)))
         return cost
     
-    def order_quantities(self) -> List[float]:
+    def order_up_to_levels(self) -> List[float]:
         '''
         Compute optimal order-up-to-levels
         '''
@@ -113,7 +113,7 @@ class RS_DP(StochasticLotSizing):
         instance = {"K": 100, "h": 1, "p": 10, "d":[20,40,60,40]}
         ww = RS_DP(**instance)
         print("Cost of an optimal plan: ", ww.optimal_cost())
-        print("Optimal order-up-to-levels: ", ww.order_quantities())
+        print("Optimal order-up-to-levels: ", ww.order_up_to_levels())
 
 if __name__ == '__main__':
     RS_DP._test()
