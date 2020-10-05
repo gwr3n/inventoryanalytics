@@ -9,7 +9,6 @@ Copyright (c) 2018 Roberto Rossi
 '''
 
 import numpy as np
-import functools 
 from scipy.stats import poisson
 from inventoryanalytics.utils import memoize as mem
 
