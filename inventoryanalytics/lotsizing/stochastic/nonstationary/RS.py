@@ -110,7 +110,7 @@ class RS_DP(StochasticLotSizing):
 
     @staticmethod
     def _test():
-        instance = {"K": 30, "h": 1, "p": 5, "d":[10,20,30,40]}
+        instance = {"K": 100, "h": 1, "p": 10, "d":[20,40,60,40]}
         ww = RS_DP(**instance)
         print("Cost of an optimal plan: ", ww.optimal_cost())
         print("Optimal order-up-to-levels: ", ww.order_quantities())
