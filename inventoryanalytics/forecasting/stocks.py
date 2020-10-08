@@ -9,7 +9,7 @@ from statsmodels.tsa.statespace.tools import diff
 from statsmodels.tsa.arima_model import ARIMA
 
 def differencing():
-    ticker = yf.Ticker("AMZN")
+    ticker = yf.Ticker("V")
     hist = ticker.history(start="2020-09-01", end="2020-10-3")
     ts = pd.Series(hist["Close"])
     differenced = diff(ts, k_diff=1)
@@ -20,7 +20,7 @@ def differencing():
     plt.show()
 
 def predict():
-    prediction_window = 14
+    prediction_window = 15
     training_window = 60
     ticker = yf.Ticker("V")
     now = datetime.datetime.now()
