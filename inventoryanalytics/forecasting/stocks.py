@@ -22,7 +22,8 @@ def differencing():
 def predict():
     prediction_window = 15
     training_window = 60
-    ticker = yf.Ticker("V")
+    symbol = "AMZN"
+    ticker = yf.Ticker(symbol)
     now = datetime.datetime.now()
     start_window = now - timedelta(days=training_window+prediction_window)
     print(now)
@@ -41,6 +42,7 @@ def predict():
     print(t)
     res.plot_predict(start=2, end=t+w, alpha=0.05, ax=ax)
     plt.plot(ts[t-1:t+w], label="realisations")
+    plt.title(symbol + "    " + start_window.strftime("%Y-%m-%d") + "    " + now.strftime("%Y-%m-%d"))
     print("Std residuals: "+str(statistics.stdev(res.resid)))
     plt.show()
 
