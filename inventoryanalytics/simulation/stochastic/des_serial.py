@@ -102,8 +102,8 @@ class Warehouse:
         self.period_costs[time] += self.on_hand_inventory()*self.h
 
 class Retailer:
-    def __init__(self, inventory_level, holding_cost, penalty_cost, lead_time):
-        self.i, self.h, self.p, self.lead_time = inventory_level, holding_cost, penalty_cost, lead_time
+    def __init__(self, inventory_level, holding_cost, penalty_cost, lead_time, demand_rate):
+        self.i, self.h, self.p, self.lead_time, self.demand_rate = inventory_level, holding_cost, penalty_cost, lead_time, demand_rate
         self.o = 0 # outstanding_orders
         self.period_costs = defaultdict(int) # a dictionary recording cost in each period
 
@@ -237,12 +237,12 @@ class ReceiveOrder_Retailer:
     def end(self):
         self.r.receive_order(self.Q, self.des.time)
 
-def simulate(retailer, S_r, demand_rate, warehouse, S_w, N, plot):
+def simulate(retailer, S_r, warehouse, S_w, N, plot):
     np.random.seed(1234)
     r, w = Retailer(**retailer), Warehouse(**warehouse)
 
     des = DES(N)
-    d = CustomerDemand(des, demand_rate, r)
+    d = CustomerDemand(des, r.demand_rate, r)
     des.schedule(EventWrapper(d), 0) # schedule a demand immediately
 
     o_r = OrderUpTo_Retailer(des, S_r, w, r)
@@ -268,13 +268,13 @@ def simulate(retailer, S_r, demand_rate, warehouse, S_w, N, plot):
     tc = sum([w.period_costs[e] for e in w.period_costs]) + sum([r.period_costs[e] for e in r.period_costs])
     return tc/N
 
-def plot_surface(retailer, demand_rate, warehouse, N):
+def plot_surface(retailer, warehouse, N):
     S_r = range(70,80)
     S_w = range(55,65)
     X, Y = np.meshgrid(S_r, S_w)
     Z = np.array([[simulate(
-        {"inventory_level": s_r, "holding_cost": retailer["holding_cost"], "penalty_cost": retailer["penalty_cost"], "lead_time": retailer["lead_time"]}, 
-        s_r, demand_rate, 
+        {"inventory_level": s_r, "holding_cost": retailer["holding_cost"], "penalty_cost": retailer["penalty_cost"], "lead_time": retailer["lead_time"], "demand_rate": retailer["demand_rate"]}, 
+        s_r,  
         {"inventory_level": s_w, "holding_cost": warehouse["holding_cost"], "lead_time": warehouse["lead_time"]}, 
         s_w, N, False) for s_r in S_r] for s_w in S_w])
     plt.contourf(X, Y, Z, levels=20, cmap ="bone")
@@ -285,9 +285,8 @@ def plot_surface(retailer, demand_rate, warehouse, N):
 
 S_r = 74
 S_w = 59
-retailer = {"inventory_level": S_r, "holding_cost": 1.5, "penalty_cost": 10, "lead_time": 5}
-demand_rate = 10
+retailer = {"inventory_level": S_r, "holding_cost": 1.5, "penalty_cost": 10, "lead_time": 5, "demand_rate": 10}
 warehouse = {"inventory_level": S_w, "holding_cost": 1, "lead_time": 5}
 N = 1000 # planning horizon length
-#print("Average cost per period: "+ '%.2f' % simulate(retailer, S_r, demand_rate, warehouse, S_w, N, False))
-plot_surface(retailer, demand_rate, warehouse, N)
+#print("Average cost per period: "+ '%.2f' % simulate(retailer, S_r, warehouse, S_w, N, True))
+plot_surface(retailer, warehouse, N)
