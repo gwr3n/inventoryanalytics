@@ -24,7 +24,7 @@ def predict():
     training_window = 60
     symbol = "AMZN"
     ticker = yf.Ticker(symbol)
-    now = datetime.datetime.now()
+    now = datetime.datetime.now() #- timedelta(days=4)
     start_window = now - timedelta(days=training_window+prediction_window)
     print(now)
     print(start_window)
