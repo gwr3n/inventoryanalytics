@@ -1,1 +1,1 @@
-__all__ = ["time_varying"]
+__all__ = ["time_varying","constant"]

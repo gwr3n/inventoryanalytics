@@ -14,6 +14,8 @@ def read(fname):
 setup(
   name = 'inventoryanalytics',
   packages = ['inventoryanalytics',
+              'inventoryanalytics.forecasting',
+              'inventoryanalytics.forecasting.test',
               'inventoryanalytics.lotsizing',
               'inventoryanalytics.lotsizing.deterministic',
               'inventoryanalytics.lotsizing.deterministic.constant',
@@ -26,6 +28,9 @@ setup(
               'inventoryanalytics.lotsizing.stochastic.nonstationary.test',
               'inventoryanalytics.lotsizing.stochastic.stationary',
               'inventoryanalytics.lotsizing.stochastic.stationary.test',
+              'inventoryanalytics.simulation',
+              'inventoryanalytics.simulation.deterministic',
+              'inventoryanalytics.simulation.stochastic',
               'inventoryanalytics.utils',
               'inventoryanalytics.utils.test'], # this must be the same as the name above
   version = '0.6',
