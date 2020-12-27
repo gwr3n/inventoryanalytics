@@ -35,7 +35,7 @@ setup(
               'inventoryanalytics.utils.test'], # this must be the same as the name above
   version = '1.0',
   description = 'A Python library dedicated to Inventory Analytics.',
-  long_description= 'A Python library dedicated to Inventory Analytics.', #read('README.md'),
+  long_description= 'A Python library dedicated to Inventory Analytics.', #read('README.md'), This cannot be used since distutils does not automatically include README.md in MANIFEST
   author = 'Roberto Rossi',
   author_email = 'robros@gmail.com',
   url = 'https://github.com/gwr3n/inventoryanalytics', # use the URL to the github repo
