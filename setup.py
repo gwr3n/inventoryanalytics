@@ -33,13 +33,13 @@ setup(
               'inventoryanalytics.simulation.stochastic',
               'inventoryanalytics.utils',
               'inventoryanalytics.utils.test'], # this must be the same as the name above
-  version = '0.10',
+  version = '1.0',
   description = 'A Python library dedicated to Inventory Analytics.',
-  long_description=read('README.md'),
+  #long_description=read('README.md'),
   author = 'Roberto Rossi',
   author_email = 'robros@gmail.com',
   url = 'https://github.com/gwr3n/inventoryanalytics', # use the URL to the github repo
-  download_url = 'https://github.com/gwr3n/inventoryanalytics/archive/0.10.tar.gz', # I'll explain this in a second
+  download_url = 'https://github.com/gwr3n/inventoryanalytics/archive/1.0.tar.gz', # I'll explain this in a second
   keywords = ['inventory', 'analytics'], # arbitrary keywords
   classifiers = [],
 )
