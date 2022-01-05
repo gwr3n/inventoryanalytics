@@ -35,13 +35,13 @@ setup(
               'inventoryanalytics.simulation.stochastic',
               'inventoryanalytics.utils',
               'inventoryanalytics.utils.test'], # this must be the same as the name above
-  version = '1.0',
+  version = '1.1',
   description = 'A Python library dedicated to Inventory Analytics.',
   long_description= 'A Python library dedicated to Inventory Analytics.', #read('README.md'), This cannot be used since distutils does not automatically include README.md in MANIFEST
   author = 'Roberto Rossi',
   author_email = 'robros@gmail.com',
   url = 'https://github.com/gwr3n/inventoryanalytics', # use the URL to the github repo
-  download_url = 'https://github.com/gwr3n/inventoryanalytics/archive/1.0.tar.gz', # I'll explain this in a second
+  download_url = 'https://github.com/gwr3n/inventoryanalytics/archive/1.1.tar.gz', # I'll explain this in a second
   keywords = ['inventory', 'analytics'], # arbitrary keywords
   classifiers = [],
 )
