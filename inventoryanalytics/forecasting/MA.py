@@ -1,3 +1,13 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 import numpy as np, pandas as pd, statistics
 import matplotlib.pyplot as plt
 from statsmodels.tsa.arima_process import ArmaProcess
@@ -53,13 +63,19 @@ def fit_MA_q():
     print("Std residuals: "+str(statistics.stdev(res.resid)))
     
     sm.graphics.tsa.plot_acf(realisations.values.squeeze(), lags=max_order)
+    plt.xlabel('lag (in periods)', fontsize=13)
+    plt.ylabel('ACF', fontsize=13)
+    plt.title('')
+    plt.savefig('/Users/gwren/Downloads/45_ma_acf.svg', format='svg')
 
     f = plt.figure(1)
     res.plot_predict(start=t, end=N, plot_insample=False)
+    plt.xlabel('Period ($t$)')
     plt.plot(realisations[0:N], label="realisations")
     plt.legend(loc="upper left")
     plt.grid(True)
     f.show()
+    plt.savefig('/Users/gwren/Downloads/46_ma_2_fit_forecasts.svg', format='svg')
     plt.show()
 
 fit_MA_q()

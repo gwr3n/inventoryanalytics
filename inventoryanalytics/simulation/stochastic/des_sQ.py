@@ -12,7 +12,7 @@ def plot_inventory(values, label):
     # plot
     plt.xticks(range(len(values)),
                range(1,len(values)+1))
-    plt.xlabel("t")
+    plt.xlabel("$t$")
     plt.ylabel("items")
     plt.plot( 'x', 'fx', data=df, linestyle='-', marker='', label=label)
 
@@ -179,6 +179,7 @@ class sQ:
         s = parameters[0]
         plt.plot([s for k in range(self.N)], label="s")
         plt.legend(loc="lower right")
+        plt.savefig('/Users/gwren/Downloads/14_sQ_policy.svg', format='svg')
         plt.show()
 
     def plot_surface(self, sq, execution_path):
@@ -191,6 +192,7 @@ class sQ:
         plt.colorbar()
         plt.xlabel("s")
         plt.ylabel("Q")
+        plt.savefig('/Users/gwren/Downloads/15_nelder_mead_sQ.svg', format='svg')
         plt.show()
 
 def plot_sQ():

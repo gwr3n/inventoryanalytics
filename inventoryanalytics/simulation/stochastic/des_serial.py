@@ -260,6 +260,7 @@ def simulate(retailer, S_r, warehouse, S_w, N, plot):
         while r.levels[cR][0] < 5:
             cR += 1
         plot_inventory(w.levels[cW:], r.levels[cR:])
+        plt.savefig('/Users/gwren/Downloads/3_serial_inventory_level.eps', format='eps')
         plt.show()
     #print("Warehouse Period costs: "+str([w.period_costs[e] for e in w.period_costs]))
     #print("Warehouse inventory level: "+str(w.levels))
@@ -281,6 +282,7 @@ def plot_surface(retailer, warehouse, N):
     plt.colorbar()
     plt.xlabel("S_r")
     plt.ylabel("S_w")
+    plt.savefig('/Users/gwren/Downloads/4_serial_system_brute_force.svg', format='svg')
     plt.show()
 
 S_r = 74

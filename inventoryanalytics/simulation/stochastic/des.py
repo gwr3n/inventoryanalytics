@@ -12,7 +12,7 @@ def plot_inventory(values, label):
     # plot
     plt.xticks(range(len(values)),
                range(1,len(values)+1))
-    plt.xlabel("t")
+    plt.xlabel("$t$")
     plt.ylabel("items")
     plt.plot( 'x', 'fx', data=df, linestyle='-', marker='', label=label)
 
@@ -166,4 +166,5 @@ print("Average cost per period: "+ '%.2f' % (sum([w.period_costs[e] for e in w.p
 plot_inventory(w.positions, "inventory position")
 plot_inventory(w.levels, "inventory level")
 plt.legend(loc="lower right")
+plt.savefig('/Users/gwren/Downloads/4_des.svg', format='svg')
 plt.show()

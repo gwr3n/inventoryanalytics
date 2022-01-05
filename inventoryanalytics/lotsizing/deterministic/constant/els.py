@@ -102,10 +102,11 @@ class els:
                           label='Total relevant cost item 3')
         plt.legend(handles=[total,item1,item2,item3], loc=1)
         plt.ylabel('Cost')
-        plt.xlabel('T')
+        plt.xlabel('$T$')
         x = [100,150,200,250,300]
         xNew = [1,1.5,2,2.5,3]
         plt.xticks(x, xNew)
+        plt.savefig('/Users/gwren/Downloads/18_els_cost_plot.eps', format='eps')
         plt.show()
 
     @staticmethod
@@ -120,5 +121,5 @@ class els:
             print("T["+str(i)+"] = "+str(pb.compute_production_cycle_length(Topt,i)))
         
 if __name__ == '__main__':
-    # els._plot_els()
-    els._sample_instance()
+    els._plot_els()
+    #els._sample_instance()

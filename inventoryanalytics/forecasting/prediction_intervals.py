@@ -1,3 +1,13 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 import math
 import numpy as np, pandas as pd
 from scipy.stats import t
@@ -17,9 +27,12 @@ def confidence_intervals():
     e = [z*s.stdev(y[r])/math.sqrt(n) for r in range(replications)]
     ec = ['red' if (y_mean[r]+z*s.stdev(y[r])/math.sqrt(n) < 0 or 
                     y_mean[r]-z*s.stdev(y[r])/math.sqrt(n) > 0) 
-                else 'black' for r in range(replications)]
+                else 'black' for r in range(replications)]            
     plt.errorbar(x, y_mean, yerr=e, ecolor=ec, fmt='none')
     plt.grid(True)
+    plt.xlabel('Replication', fontsize=13)
+    plt.ylabel('$\mathcal{I}(\\alpha)$', rotation=0, fontsize=13)
+    plt.savefig('/Users/gwren/Downloads/25_confidence_intervals.eps', format='eps')
     plt.show()
 
 def prediction_intervals_known_parameters():
@@ -36,6 +49,9 @@ def prediction_intervals_known_parameters():
                 else 'blue' for r in range(replications)]
     plt.scatter(x, y, color=ec)
     plt.grid(True)
+    plt.xlabel('$t$', fontsize=15)
+    plt.ylabel('$X_t$ ', rotation=0, fontsize=15, loc='top')
+    plt.savefig('/Users/gwren/Downloads/26_normal_prediction_intervals.eps', format='eps')
     plt.show()
 
 def prediction_intervals_unknown_parameters():
@@ -55,6 +71,9 @@ def prediction_intervals_unknown_parameters():
                 else 'blue' for r in range(replications-1)]
     plt.scatter(x[:-1], y[1:], color=ec)
     plt.grid(True)
+    plt.xlabel('$t$')
+    plt.ylabel('$X_t$', rotation=0)
+    plt.savefig('/Users/gwren/Downloads/27_prediction_intervals_unknown_mu_sigma.eps', format='eps')
     plt.show()
 
 def sample_random_walk(X0, realisations):
@@ -82,11 +101,11 @@ def residuals(realisations, forecasts):
 def plot(realisations, forecasts, stdev, alpha):
     f = plt.figure(1)
     plt.title("Naïve method")
-    plt.xlabel('Period')
+    plt.xlabel('Period ($t$)')
     first, last = next(x for x, val in enumerate(forecasts) if ~np.isnan(val)), len(forecasts)-1
     plt.axvspan(first, last, alpha=0.2, color='blue')
-    plt.plot(forecasts, "r", label="Naïve forecasts")
-    plt.plot(realisations, "b", label="Actual values")
+    plt.plot(forecasts, "r", label="Naïve forecasts ($\widehat{X}_t$)")
+    plt.plot(realisations, "b", label="Actual values ($x_t$)")
     z = t.ppf(1-(1-alpha)/2, len(realisations)-1) # inverse t distribution
     plt.fill_between(range(first, last+1), 
                      [forecasts[first+k]-z*stdev*math.sqrt(k) for k in range(last-first+1)], 
@@ -105,9 +124,10 @@ def prediction_intervals_naive():
     plot(realisations, forecasts, s.stdev(res), alpha) 
     print("E[e_t] = "+str(s.mean(res)))
     print("Stdev[e_t] = "+str(s.stdev(res)))
+    plt.savefig('/Users/gwren/Downloads/28_prediction_intervals_naive.svg', format='svg')
     plt.show()
 
 #confidence_intervals()
-#prediction_intervals_known_parameters()
+prediction_intervals_known_parameters()
 #prediction_intervals_unknown_parameters()
-prediction_intervals_naive()
+#prediction_intervals_naive()

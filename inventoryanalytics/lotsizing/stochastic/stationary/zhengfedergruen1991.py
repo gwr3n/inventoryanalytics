@@ -129,6 +129,7 @@ class ZhengFedergruen(object):
                            lw=0.5, length_includes_head=False, head_width=0.3, head_length=0.5)
         plt.xlabel("s")
         plt.ylabel("S")
+        plt.savefig('/Users/gwren/Downloads/10_zf_execution_path.eps', format='eps')
         plt.show()
 
     @staticmethod

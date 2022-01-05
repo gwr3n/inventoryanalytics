@@ -1,3 +1,13 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 import math, statistics, scipy.stats as stats, statsmodels.api as sm
 import numpy as np, pandas as pd
 import matplotlib.pyplot as plt, pylab as py  
@@ -55,7 +65,8 @@ def seasonal_naive(series, m, t):
 
 def plot(realisations, forecasts, test_window):
     f = plt.figure(1)
-    plt.xlabel('Period')
+    plt.xlabel('Period ($t$)')
+    plt.ylabel('Realisation ($x_t$)')
     plt.axvspan(*test_window, alpha=0.2, color='blue')
     plt.plot(realisations, "b")
     plt.text(83, -5, 'Test data')
@@ -65,7 +76,7 @@ def plot(realisations, forecasts, test_window):
 
 def plot_methods(realisations, forecasts, test_window):
     f = plt.figure(2)
-    plt.xlabel('Period')
+    plt.xlabel('Period ($t$)')
     plt.plot(realisations, label="Actual values")
     plt.axvspan(*test_window, alpha=0.2, color='blue')
     for key in forecasts:
@@ -81,12 +92,14 @@ naive_forecasts = naive(realisations, t)
 drift_forecasts = drift(realisations, t)
 seasonal_naive_forecasts = seasonal_naive(realisations, m, t)
 plot(realisations, seasonal_naive_forecasts, test_window) 
+plt.savefig('/Users/gwren/Downloads/23_training_test_data.svg', format='svg')
 methods = {
     "Moving Average": sma_forecasts, 
     "Naive": naive_forecasts, 
     "Drift": drift_forecasts, 
     "Seasonal naive": seasonal_naive_forecasts}
 plot_methods(realisations, methods, test_window) 
+plt.savefig('/Users/gwren/Downloads/24_seasonal_random_walk_forecasting_methods.svg', format='svg')
 print("MAE")
 for k in methods:
     print(k,end=':\t')

@@ -230,7 +230,8 @@ class eoq:
                             label='Holding cost')
         plt.legend(handles=[total,ordering,holding], loc=1)
         plt.ylabel('Cost')
-        plt.xlabel('Q')
+        plt.xlabel('$Q$')
+        plt.savefig('/Users/gwren/Downloads/3_eoq_cost_plot.eps', format='eps')
         plt.show()
     
     @staticmethod
@@ -240,7 +241,8 @@ class eoq:
         QOpt = int(np.round(pb.compute_eoq()))
         plt.plot([k for k in range(20-QOpt,80-QOpt)], [pb.sensitivity_to_Q(k) for k in range(20,80)])
         plt.ylabel('Sensitivity')
-        plt.xlabel('Difference between Q and Q*')
+        plt.xlabel('Difference between $Q$ and $Q^*$')
+        plt.savefig('/Users/gwren/Downloads/5_eoq_sensitivity_to_Q.eps', format='eps')
         plt.show() 
     
     @staticmethod
@@ -249,7 +251,8 @@ class eoq:
         pb = eoq(**instance)
         plt.plot([k for k in range(60-pb.K,140-pb.K)], [pb.sensitivity_to_K(k) for k in range(60,140)])
         plt.ylabel('Sensitivity')
-        plt.xlabel('Difference between K\' and K')
+        plt.xlabel('Difference between $K\'$ and $K$')
+        plt.savefig('/Users/gwren/Downloads/6_eoq_sensitivity_to_K.eps', format='eps')
         plt.show() 
 
     @staticmethod
@@ -258,7 +261,8 @@ class eoq:
         pb = eoq(**instance)
         plt.plot([k*0.1-pb.h for k in range(1,30)], [pb.sensitivity_to_h(k*0.1) for k in range(1,30)])
         plt.ylabel('Sensitivity')
-        plt.xlabel('Difference between h\' and h')
+        plt.xlabel('Difference between $h\'$ and $h$')
+        plt.savefig('/Users/gwren/Downloads/7_eoq_sensitivity_to_h.eps', format='eps')
         plt.show() 
 
     @staticmethod
@@ -314,8 +318,7 @@ class eoq_discounts(eoq):
         for j in range(1, len(pb.v)+1):
             plt.plot([k for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))], [pb.unit_cost(k) for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))])
         plt.ylabel('Per unit purchasing cost')
-        plt.xlabel('Q')
-        plt.show() 
+        plt.xlabel('$Q$') 
 
     @staticmethod
     def _print_total_cost(pb):
@@ -324,8 +327,7 @@ class eoq_discounts(eoq):
         for j in range(1, len(pb.v)+1):
             plt.plot([k for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))], [pb.cost(k) for k in range(max(minQ,pb.b[j-1]),min(pb.b[j],maxQ))])
         plt.ylabel('Total cost')
-        plt.xlabel('Q')
-        plt.show() 
+        plt.xlabel('$Q$')
         
 class eoq_all_units_discounts(eoq_discounts):
     def unit_cost(self, Q):
@@ -349,6 +351,8 @@ class eoq_all_units_discounts(eoq_discounts):
         instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
         pb = eoq_all_units_discounts(**instance)
         eoq_discounts._print_unit_cost(pb)
+        plt.savefig('/Users/gwren/Downloads/10_eoq_all_units_quantity_discounts.eps', format='eps')
+        plt.show() 
     
     @staticmethod
     def _print_total_cost():
@@ -358,6 +362,8 @@ class eoq_all_units_discounts(eoq_discounts):
         print(Q)
         print(pb.cost(Q))
         eoq_discounts._print_total_cost(pb)
+        plt.savefig('/Users/gwren/Downloads/11_eoq_all_units_quantity_discounts_total_cost.eps', format='eps')
+        plt.show() 
 
 class eoq_incremental_discounts(eoq_discounts):
     def unit_cost(self, Q):
@@ -386,6 +392,8 @@ class eoq_incremental_discounts(eoq_discounts):
         instance = {"K": 100, "h": 1, "d": 10, "b": [10,20,30], "v": [5,4,3,2]}
         pb = eoq_incremental_discounts(**instance)
         eoq_discounts._print_unit_cost(pb)
+        plt.savefig('/Users/gwren/Downloads/12_eoq_incremental_quantity_discounts.eps', format='eps')
+        plt.show() 
     
     @staticmethod
     def _print_total_cost():
@@ -395,6 +403,8 @@ class eoq_incremental_discounts(eoq_discounts):
         print(Q)
         print(pb.cost(Q))
         eoq_discounts._print_total_cost(pb)
+        plt.savefig('/Users/gwren/Downloads/13_eoq_incremental_quantity_discounts_total_cost.eps', format='eps')
+        plt.show() 
 
 class eoq_planned_backorders:
     def __init__(self, K: float, h: float, d: float, v: float, p: float):
@@ -638,7 +648,7 @@ class epq:
                             label='Holding cost')
         plt.legend(handles=[total,ordering,holding], loc=1)
         plt.ylabel('Cost')
-        plt.xlabel('Q')
+        plt.xlabel('$Q$')
         plt.show()
 
     @staticmethod
@@ -652,7 +662,7 @@ class epq:
         print(pb._optimal_relevant_cost_closed_form())
 
 if __name__ == '__main__':
-    #eoq._plot_eoq()
+    eoq._plot_eoq()
     #eoq._plot_sensitivity_to_Q()
     #eoq._plot_sensitivity_to_K()
     #eoq._plot_sensitivity_to_h()
@@ -663,4 +673,4 @@ if __name__ == '__main__':
     #eoq_all_units_discounts._print_total_cost()
     #eoq_incremental_discounts._print_unit_cost()
     #eoq_incremental_discounts._print_total_cost()
-    epq._plot_epq()
+    #epq._plot_epq()

@@ -1,3 +1,13 @@
+'''
+inventoryanalytics: a Python library for Inventory Analytics
+
+Author: Roberto Rossi
+
+MIT License
+  
+Copyright (c) 2018 Roberto Rossi
+'''
+
 import numpy as np, pandas as pd, statistics
 from statsmodels.tsa.ar_model import AutoReg, ar_select_order
 import matplotlib.pyplot as plt
@@ -40,6 +50,8 @@ def fit_AR_p():
 
     f = plt.figure(1)
     res.plot_diagnostics(fig=f, lags=30)
+    plt.tight_layout()
+    plt.savefig('/Users/gwren/Downloads/43_ar_1_fit_diagnostics.svg', format='svg')
     f.show()
 
     f = plt.figure(1)
@@ -47,6 +59,8 @@ def fit_AR_p():
     plt.plot(realisations[0:N], label="realisations")
     plt.legend(loc="upper left")
     plt.grid(True)
+    plt.xlabel('Period ($t$)')
+    plt.savefig('/Users/gwren/Downloads/44_ar_1_fit_forecasts.svg', format='svg')
     f.show()
 
 fit_AR_p()

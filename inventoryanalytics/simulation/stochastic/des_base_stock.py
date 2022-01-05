@@ -12,7 +12,7 @@ def plot_inventory(values, label):
     # plot
     plt.xticks(range(len(values)),
                range(1,len(values)+1))
-    plt.xlabel("t")
+    plt.xlabel("$t$")
     plt.ylabel("items")
     plt.plot( 'x', 'fx', data=df, linestyle='-', marker='', label=label)
 
@@ -154,8 +154,12 @@ des = DES(N)
 d = CustomerDemand(des, 10, w)
 des.schedule(EventWrapper(d), 0) # schedule a demand immediately
 
+### No lead time ###
 lead_time = 0
 o = OrderUpTo(des, 13, w, lead_time)
+### Lead time ###
+# lead_time = 1
+# o = OrderUpTo(des, 20, w, lead_time)
 for t in range(N):
     des.schedule(EventWrapper(o), t) # schedule orders
 des.schedule(EventWrapper(EndOfPeriod(des, w)), 1) # schedule EndOfPeriod at the end of the first period
@@ -167,4 +171,6 @@ print("Average cost per period: "+ '%.2f' % (sum([w.period_costs[e] for e in w.p
 plot_inventory(w.positions, "inventory position")
 plot_inventory(w.levels, "inventory level")
 plt.legend(loc="lower right")
+plt.savefig('/Users/gwren/Downloads/6_base_stock.svg', format='svg')
+#plt.savefig('/Users/gwren/Downloads/7_base_stock_leadtime.svg', format='svg')
 plt.show()

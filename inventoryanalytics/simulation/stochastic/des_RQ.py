@@ -121,20 +121,17 @@ class EndOfPeriod:
         self.w.incur_end_of_period_costs(self.des.time-1)
         self.des.schedule(EventWrapper(EndOfPeriod(self.des, self.w)), 1)
 
-class InventoryReview:
-    def __init__(self, des: DES, s: float, S: float, warehouse: Warehouse, lead_time: float, B: float):
-        self.s, self.S = s, S # the reorder point and the order-up-to-level
+class Order:
+    def __init__(self, des: DES, Q: float, warehouse: Warehouse, lead_time: float):
+        self.Q = Q # the order quantity
         self.w = warehouse # the warehouse
         self.des = des # the Discrete Event Simulation engine
-        self.lead_time, self.B = lead_time, B
+        self.lead_time = lead_time
         self.priority = 1 # denotes a medium priority
 
     def end(self):
-        if self.w.inventory_position() < self.s:
-            Q = min(self.S - self.w.inventory_position(), self.B)
-            self.w.order(Q, self.des.time)
-            self.des.schedule(EventWrapper(ReceiveOrder(self.des, Q, self.w)), self.lead_time)
-        self.des.schedule(EventWrapper(self), 1) # schedule another review in 1 period
+        self.w.order(self.Q, self.des.time)
+        self.des.schedule(EventWrapper(ReceiveOrder(self.des, self.Q, self.w)), self.lead_time)
         
 class ReceiveOrder:
     def __init__(self, des: DES, Q: float, warehouse: Warehouse):
@@ -147,17 +144,24 @@ class ReceiveOrder:
         self.w.receive_order(self.Q, self.des.time)
 
 np.random.seed(1234)
-instance = {"inventory_level": 0, "fixed_ordering_cost": 64, "holding_cost": 1, "penalty_cost": 9}
+instance = {"inventory_level": 0, "fixed_ordering_cost": 300, "holding_cost": 1, "penalty_cost": 20}
 w = Warehouse(**instance)
 
-N = 20 # planning horizon length
+N = 8 # planning horizon length
 des = DES(N)
-d = CustomerDemand(des, 10, w)
+
+d = CustomerDemand(des, 100, w)
 des.schedule(EventWrapper(d), 0) # schedule a demand immediately
 
-lead_time, capacity, s, S = 0, 10000, 6, 40 # set a very large capacity
-o = InventoryReview(des, s, S, w, lead_time, capacity)
-des.schedule(EventWrapper(o), 0) # schedule an order immediately
+lead_time = 0
+o = Order(des, 223, w, lead_time)
+des.schedule(EventWrapper(o), 0) # schedule order
+o = Order(des, 209, w, lead_time)
+des.schedule(EventWrapper(o), 2) # schedule order
+o = Order(des, 207, w, lead_time)
+des.schedule(EventWrapper(o), 4) # schedule order
+o = Order(des, 206, w, lead_time)
+des.schedule(EventWrapper(o), 6) # schedule order
 des.schedule(EventWrapper(EndOfPeriod(des, w)), 1) # schedule EndOfPeriod at the end of the first period
 des.start()
 
@@ -166,8 +170,6 @@ print("Average cost per period: "+ '%.2f' % (sum([w.period_costs[e] for e in w.p
 
 plot_inventory(w.positions, "inventory position")
 plot_inventory(w.levels, "inventory level")
-plt.plot([S for k in range(N)], label="S")
-plt.plot([s for k in range(N)], label="s")
 plt.legend(loc="lower right")
-plt.savefig('/Users/gwren/Downloads/11_sim_stationary_sS.svg', format='svg')
+plt.savefig('/Users/gwren/Downloads/16_des_RQ.svg', format='svg')
 plt.show()
