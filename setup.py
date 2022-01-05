@@ -1,4 +1,6 @@
 # http://peterdowns.com/posts/first-time-with-pypi.html
+# git tag x.y.z
+# git push --tags
 # python setup.py sdist upload -r pypi
 
 import os
