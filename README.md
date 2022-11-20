@@ -8,6 +8,6 @@ To cite inventoryanalytics:
   title = {inventoryanalytics: a Python library dedicated to Inventory Analytics},
   url = {https://github.com/gwr3n/inventoryanalytics},
   version = {1.1},
-  year = {2022},
+  year = {2022}
 }
 ```
