@@ -281,7 +281,7 @@ class StochasticLotSizing:
     def testKBConvexity_full(self) -> bool:
         """
         Tests CK convexity as originally introduced in Gallego G, Scheller-Wolf A (2000) 
-        Capacitated inventory problems with xed order costs: Some optimal policy structure. 
+        Capacitated inventory problems with fixed order costs: Some optimal policy structure. 
         European Journal of Operational Research 126(3):603-613.
 
         Returns:
@@ -296,7 +296,7 @@ class StochasticLotSizing:
     def testKBConvexity_random(self) -> bool:
         """
         Tests CK convexity as originally introduced in Gallego G, Scheller-Wolf A (2000) 
-        Capacitated inventory problems with xed order costs: Some optimal policy structure. 
+        Capacitated inventory problems with fixed order costs: Some optimal policy structure. 
         European Journal of Operational Research 126(3):603-613.
 
         Returns:
