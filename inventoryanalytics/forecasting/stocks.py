@@ -17,7 +17,8 @@ import statsmodels.api as sm, pandas as pd, statistics
 
 from statsmodels.tsa.statespace.tools import diff
 
-from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.graphics.tsaplots import plot_predict
 
 def differencing():
     ticker = yf.Ticker("AMZN")
@@ -53,7 +54,7 @@ def predict(fig, ax):
     print(res.summary())
 
     print(t)
-    res.plot_predict(start=2, end=t+w, alpha=0.05, ax=ax)
+    plot_predict(res, start=2, end=t+w, alpha=0.05, ax=ax)
     plt.plot(ts[t-1:t+w], label="realisations")
     plt.title(symbol + "    " + start_window.strftime("%Y-%m-%d") + "    " + now.strftime("%Y-%m-%d"))
     print("Std residuals: "+str(statistics.stdev(res.resid)))
