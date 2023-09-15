@@ -232,20 +232,19 @@ class StochasticLotSizing:
         Returns:
             float -- the cost of an optimal policy 
         """
-        #Forward recursion
-        v = min(                                                                # optimal cost
-            [sum([p[1]*(self.iv(s, a, p[0])+                                    # immediate cost
-                       (self.w*self._f(self.st(s, a, p[0])) if s.t < self.T-1 else 0)) # future cost
-                  for p in self.pmf[s.t]])                                      # demand realisations
-             for a in self.ag(s)])                                              # actions
+        # Forward recursion
+        values = [sum([p[1]*(self.iv(s, a, p[0])+                                    # immediate cost
+                            (self._f(self.st(s, a, p[0])) if s.t < self.T-1 else 0)) # future cost
+                  for p in self.pmf[s.t]])                                           # demand realisations
+                  for a in self.ag(s)]                                               # actions
 
-        opt_a = lambda a: sum([p[1]*(self.iv(s, a, p[0])+                       # optimal action
-                                    (self.w*self._f(self.st(s, a, p[0])) if s.t < self.T-1 else 0)) 
-                               for p in self.pmf[s.t]]) == v          
-                               
-        q = [k for k in filter(opt_a, self.ag(s))]                              # retrieve best action list
-        self.cache_actions[str(s)]=q[0] if bool(q) else None                    # store an action in dictionary
-        return v                                                                # return expected total cost
+        v = min(values)  
+        try:        
+            self.cache_actions[str(s)]=self.ag(s)[values.index(v)]                   # store best action in dictionary
+        except ValueError:
+            self.cache_actions[str(s)]=None
+            print("Error in retrieving best action")
+        return v                                                                     # return expected total cost
 
     def extract_skSk_policy(self) -> List[float]:
         """
