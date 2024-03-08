@@ -49,7 +49,7 @@ def predict(fig, ax):
     #print(np.append(hist["Close"].values[1:], yf.download(tickers=symbol, period='1d', interval='5m').tail(1)["Close"].values[0]))
     ts = pd.Series(np.append(hist["Close"].values[1:], yf.download(tickers=symbol, period='1d', interval='5m').tail(1)["Close"].values[0]))
     ts = ts.astype(float)
-    model = ARIMA(ts[0:t], order=(0,1,0))
+    model = ARIMA(ts[0:t], order=(1,2,3))
     res = model.fit()
     print(res.summary())
 
