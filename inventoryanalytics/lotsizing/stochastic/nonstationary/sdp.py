@@ -148,18 +148,19 @@ class StochasticLotSizing:
             float -- the cost of an optimal policy 
         """
         #Forward recursion
-        v = min(
-            [sum([p[1]*(self.iv(s, a, p[0])+                                    # immediate cost
-                       (self._f(self.st(s, a, p[0])) if s.t < self.T else 0))   # future cost
-                  for p in self.pmf[s.t]])                                      # demand realisations
-             for a in self.ag(s)])                                              # actions
-        opt_a = lambda a: sum([p[1]*(self.iv(s, a, p[0])+
-                                    (self._f(self.st(s, a, p[0])) if s.t < self.T else 0)) 
-                               for p in self.pmf[s.t]]) == v          
-        q = [k for k in filter(opt_a, self.ag(s))]                              # retrieve best action list
-        self.cache_actions[str(s)]=q[0] if bool(q) else None                    # store an action in dictionary
-        return v                                                                # return expected total cost
-
+        values = [sum([p[1]*(self.iv(s, a, p[0])+                                    # immediate cost
+                            (self._f(self.st(s, a, p[0])) if s.t < self.T else 0))   # future cost
+                  for p in self.pmf[s.t]])                                           # demand realisations
+                  for a in self.ag(s)]                                               # actions
+        
+        v = min(values) 
+        try: 
+            self.cache_actions[str(s)]=self.ag(s)[values.index(v)]                   # store an action in dictionary
+        except ValueError:
+            self.cache_actions[str(s)]=None
+            print("Error in retrieving best action")
+        return v                                                                     # return expected total cost
+    
     @staticmethod
     def run_instance(file_name: str = None):
         instance = {"K": 100, "v": 0, "h": 1, "p": 10, "d": [20,40,60,40], 
