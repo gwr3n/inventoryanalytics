@@ -50,7 +50,7 @@ def folf(lmbda, Q):
 
 class StochasticLotSizingProblem:
     """
-    A non-stationary stochastic lot sizing problem.
+    A non-stationary stochastic lot sizing problem under penalty costs, see e.g.
 
     R. Rossi, O. A. Kilic, S. A. Tarim, 
     "Piecewise linear approximations for the static-dynamic uncertainty strategy in stochastic lot-sizing", 
@@ -72,11 +72,16 @@ class StochasticLotSizingProblem:
         
 class RS_DP(StochasticLotSizingProblem):
     """
-    Implements the traditional Wagner-Whitin shortest path algorithm.
+    Implements the traditional Wagner-Whitin shortest path algorithm 
 
     H.M. Wagner and T. Whitin, 
     "Dynamic version of the economic lot size model," 
     Management Science, Vol. 5, pp. 89–96, 1958
+
+    in a stochastic setting under penalty costs, as discussed in 
+
+    S. A. Tarim. Dynamic Lotsizing Models for Stochastic Demand in Single and
+    Multi-Echelon Inventory Systems. PhD thesis, Lancaster University, 1996.
     """
 
     def __init__(self, K: float, h: float, p: float, d: List[float], I0: float = float('nan')):
