@@ -22,13 +22,15 @@ from statsmodels.graphics.tsaplots import plot_predict
 
 def differencing():
     ticker = yf.Ticker("AMZN")
-    hist = ticker.history(start="2020-09-01", end="2020-10-3")
+    hist = ticker.history(start="2024-01-01", end="2024-11-30")
     ts = pd.Series(hist["Close"])
     differenced = diff(ts, k_diff=1)
+    print(f"Mean:{statistics.mean(differenced)}")
+    print(f"Std:{statistics.stdev(differenced)}")
     res = differenced/statistics.stdev(differenced)
     plt.plot(res)
-    #sm.qqplot(res, line ='45') 
-    #plt.acorr(res, maxlags=30)
+    sm.qqplot(res, line ='45') 
+    plt.acorr(res, maxlags=20)
     plt.show()
 
 def predict(fig, ax):
