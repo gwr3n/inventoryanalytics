@@ -13,6 +13,7 @@ import networkx as nx
 import scipy.integrate as integrate
 from itertools import accumulate
 from scipy.stats import poisson
+import scipy.stats as stats
 from scipy.optimize import minimize
 
 class MultiPeriodNewsvendor:
@@ -20,7 +21,8 @@ class MultiPeriodNewsvendor:
         self.mean, self.o, self.u = mean, h, p    
 
     def cfolf(self, Q, d): # complementary first order loss function
-        return integrate.quad(lambda x: poisson.cdf(x, d), 0, Q)[0]
+        #return integrate.quad(lambda x: poisson.cdf(x, d), 0, Q)[0]
+        return sum(stats.poisson.cdf(k, d) for k in range(int(Q)))
 
     def folf(self,Q): # first order loss function
         return self.cfolf(Q)-self.u*(Q - self.mean)
