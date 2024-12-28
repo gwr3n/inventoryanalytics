@@ -8,7 +8,6 @@ MIT License
 Copyright (c) 2018 Roberto Rossi
 '''
 
-import sys
 from typing import List
 import time
 import math
@@ -248,7 +247,7 @@ class RS_DP(StochasticLotSizingProblem):
 
     @staticmethod
     def _test():
-        instance = {"K": 50, "h": 1, "p": 10, "d":[30,40,30,40,30,30,40,30,40,30]}
+        instance = {"K": 100, "h": 1, "p": 10, "d":[20,40,60,40]}
         ww = RS_DP(**instance)
         start_time = time.time()
         optCost = ww.optimal_cost()
