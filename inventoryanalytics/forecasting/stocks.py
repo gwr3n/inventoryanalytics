@@ -67,6 +67,6 @@ def predict(fig, ax):
     #plt.pause(1)
     #plt.cla()
 
-differencing()
-#fig, ax = plt.subplots()
-#predict(fig, ax)
+#differencing()
+fig, ax = plt.subplots()
+predict(fig, ax)
