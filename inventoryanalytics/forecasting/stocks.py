@@ -21,8 +21,10 @@ from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.graphics.tsaplots import plot_predict
 
 def differencing():
-    ticker = yf.Ticker("AMZN")
-    hist = ticker.history(start="2024-01-01", end="2024-11-30")
+    ticker = yf.Ticker("MSFT")
+    now = datetime.datetime.now()# - timedelta(days=15)
+    start_window = now - timedelta(days=75)
+    hist = ticker.history(start=start_window.strftime("%Y-%m-%d"), end=now.strftime("%Y-%m-%d"))
     ts = pd.Series(hist["Close"])
     differenced = diff(ts, k_diff=1)
     print(f"Mean:{statistics.mean(differenced)}")
@@ -65,6 +67,6 @@ def predict(fig, ax):
     #plt.pause(1)
     #plt.cla()
 
-#differencing()
-fig, ax = plt.subplots()
-predict(fig, ax)
+differencing()
+#fig, ax = plt.subplots()
+#predict(fig, ax)
