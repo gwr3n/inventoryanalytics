@@ -18,9 +18,13 @@ dependencies = [
     "scipy==1.10.1",
     "matplotlib==3.7.5",
     "scikit-learn==1.2.2",
+    "statsmodels==0.14.1",
     "docplex==2.25.236",
     "networkx==2.8.8",
 ]
+
+[project.scripts]
+inventoryanalytics = "inventoryanalytics.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/gwr3n/inventoryanalytics"

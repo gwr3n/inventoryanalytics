@@ -159,6 +159,5 @@ def simple_exponential_smoothing_ci(stochastic_process):
         quit()    
     py.show()
 
-# simple_exponential_smoothing()
-# simple_exponential_smoothing_statsmodels()
-simple_exponential_smoothing_ci("GP")
+if __name__ == "__main__":
+    simple_exponential_smoothing_ci("GP")

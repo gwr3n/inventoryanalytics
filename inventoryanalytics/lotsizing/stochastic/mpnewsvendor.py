@@ -24,9 +24,10 @@ class MultiPeriodNewsvendor:
         critical_fractile = T*self.u/(self.u+self.o)
         return sum([poisson.cdf(Q, d) for d in accumulate(self.mean)]) - critical_fractile < 0.1
 
-instance = {"o" : 1, "u": 5, "mean" : [10,10,10]}
-nb = MultiPeriodNewsvendor(instance)
-res = nb.optC()
-print(res)
-print("Optimal cost: "+str(res.fun))
-print("Verify critical fractile solution: "+str(nb.verify_fractile_solution(res.x[0])))
+if __name__ == "__main__":
+    instance = {"o": 1, "u": 5, "mean": [10,10,10]}
+    nb = MultiPeriodNewsvendor(instance)
+    res = nb.optC()
+    print(res)
+    print("Optimal cost: "+str(res.fun))
+    print("Verify critical fractile solution: "+str(nb.verify_fractile_solution(res.x[0])))

@@ -90,21 +90,22 @@ def residuals_autocorrelation(residuals, window):
     plt.savefig('/Users/gwren/Downloads/6_sma_residuals_acor.eps', format='eps')
     f.show()
 
-N, t, window = 200, 160, 32
-realisations = pd.Series(sample_gaussian_process(20, 5, N), range(N))
-forecasts = moving_average(realisations, window, t)
-plot(realisations, forecasts, window) 
-forecasts = moving_average_rolling(realisations, window)
-residuals = residuals(realisations[window:], forecasts[window:])
-print("E[e_t] = "+str(statistics.mean(residuals)))
-print("Stdev[e_t] = "+str(statistics.stdev(residuals)))
-standardised_residuals = standardised_residuals(realisations[window:], forecasts[window:])
-residuals_plot(residuals)
-residuals_histogram(standardised_residuals)
-residuals_autocorrelation(residuals, None)
-sm.qqplot(standardised_residuals, line ='45') 
-plt.savefig('/Users/gwren/Downloads/7_sma_residuals_QQ.eps', format='eps')
-py.show() 
+if __name__ == "__main__":
+    N, t, window = 200, 160, 32
+    realisations = pd.Series(sample_gaussian_process(20, 5, N), range(N))
+    forecasts = moving_average(realisations, window, t)
+    plot(realisations, forecasts, window)
+    forecasts = moving_average_rolling(realisations, window)
+    errors = residuals(realisations[window:], forecasts[window:])
+    print("E[e_t] = "+str(statistics.mean(errors)))
+    print("Stdev[e_t] = "+str(statistics.stdev(errors)))
+    standardised_errors = standardised_residuals(realisations[window:], forecasts[window:])
+    residuals_plot(errors)
+    residuals_histogram(standardised_errors)
+    residuals_autocorrelation(errors, None)
+    sm.qqplot(standardised_errors, line='45')
+    plt.savefig('/Users/gwren/Downloads/7_sma_residuals_QQ.eps', format='eps')
+    py.show()
 
     
   
