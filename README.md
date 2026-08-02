@@ -52,7 +52,7 @@ To cite inventoryanalytics:
   author = {Roberto Rossi},
   title = {inventoryanalytics: a Python library dedicated to Inventory Analytics},
   url = {https://github.com/gwr3n/inventoryanalytics},
-  version = {2.0},
-  year = {2022}
+  version = {2.1},
+  year = {2026}
 }
 ```
