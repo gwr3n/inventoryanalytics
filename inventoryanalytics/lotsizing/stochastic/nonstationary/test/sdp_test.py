@@ -41,5 +41,24 @@ class TestScarf1960(unittest.TestCase):
         lot_sizing = sdp.StochasticLotSizing(**self.input)
         self.assertEqual(lot_sizing.d, [20,40,60,40])
 
+    def test_small_instance_optimal_value_and_action(self):
+        instance = {"K": 10, "v": 0, "h": 1, "p": 5, "d": [3],
+                    "max_inv": 5, "q": 0.99, "initial_order": True}
+        lot_sizing = sdp.StochasticLotSizing(**instance)
+
+        self.assertAlmostEqual(lot_sizing.f(0), 12.659152403455883)
+        self.assertEqual(lot_sizing.q(0, 0), 4)
+        self.assertEqual(lot_sizing.extract_sS_policy(), [[0, 4]])
+
+    def test_initial_order_flag_restricts_first_period_actions(self):
+        instance = {"K": 10, "v": 0, "h": 1, "p": 5, "d": [3, 6],
+                    "max_inv": 5, "q": 0.99, "initial_order": False}
+        lot_sizing = sdp.StochasticLotSizing(**instance)
+
+        self.assertEqual(lot_sizing.ag(sdp.State(0, 0)), [0])
+        self.assertEqual(len(lot_sizing.ag(sdp.State(1, 0))), 5)
+        self.assertAlmostEqual(lot_sizing.f(0), 35.1298879904312)
+        self.assertEqual(lot_sizing.q(0, 0), 0)
+
 if __name__ == '__main__':
     unittest.main()

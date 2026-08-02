@@ -20,7 +20,7 @@ class TestWagnerWhitin(unittest.TestCase):
         self.data['mu'] = 10
         pb = zf.ZhengFedergruen(**self.data)
         pb.findOptimalPolicy()
-        self.assertEqual(pb.c(6,40), 35.02155527232042)
+        self.assertAlmostEqual(pb.c(6,40), 35.02155527232042, places=12)
         
     def test_instance_2(self):
         self.data['mu'] = 20
@@ -32,4 +32,4 @@ class TestWagnerWhitin(unittest.TestCase):
         self.data['mu'] = 64
         pb = zf.ZhengFedergruen(**self.data)
         pb.findOptimalPolicy()
-        self.assertEqual(pb.c(55,74), 78.40232070917746)
+        self.assertAlmostEqual(pb.c(55,74), 78.40232070917746, places=12)
