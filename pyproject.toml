@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inventoryanalytics"
+version = "2.0"
+description = "A Python library dedicated to Inventory Analytics."
+readme = "README.md"
+requires-python = ">=3.8,<3.11"
+license = "MIT"
+authors = [
+    { name = "Roberto Rossi", email = "robros@gmail.com" },
+]
+keywords = ["inventory", "analytics"]
+dependencies = [
+    "numpy==1.23.5",
+    "scipy==1.10.1",
+    "matplotlib==3.7.5",
+    "scikit-learn==1.2.2",
+    "docplex==2.25.236",
+    "networkx==2.8.8",
+]
+
+[project.urls]
+Homepage = "https://github.com/gwr3n/inventoryanalytics"
+Repository = "https://github.com/gwr3n/inventoryanalytics"
+
+[tool.setuptools.packages.find]
+include = ["inventoryanalytics*"]
+
+[tool.setuptools.package-data]
+"inventoryanalytics.abc" = ["data/*.csv"]

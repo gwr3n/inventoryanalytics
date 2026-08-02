@@ -1,8 +1,2 @@
-# The test suite uses np.float, which was removed in NumPy 1.24.
-# Use Python 3.10 or earlier; assertAlmostEquals was removed in Python 3.11.
-numpy==1.23.5
-scipy==1.10.1
-matplotlib==3.7.5
-scikit-learn==1.2.2
-docplex==2.25.236
-networkx==2.8.8
+# Runtime dependencies are declared in pyproject.toml.
+.
