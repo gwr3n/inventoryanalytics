@@ -110,3 +110,6 @@ venv.bak/
 
 # Mac
 .DS_Store
+
+# Excluded folders
+abc
