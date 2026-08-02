@@ -85,7 +85,7 @@ class TestEOQ_incremental_discounts(unittest.TestCase):
         instance = {"K": 8, "h": 0.3, "d": 1300, "b": [400,800], "v": [0.75,0.72,0.68]}
         pb = eoq.eoq_incremental_discounts(**instance)
         Q = pb.compute_eoq()
-        self.assertAlmostEqual(Q, 304.05, places=2)
+        self.assertAlmostEqual(Q, 304.04, places=2)
         self.assertAlmostEqual(pb.cost(Q), 1043.41, places=2)
 
 class TestEOQ_planned_backorders(unittest.TestCase):

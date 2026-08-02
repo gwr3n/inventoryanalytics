@@ -45,7 +45,7 @@ class jrp:
         print("Solving model....")
         msol = mdl.solve(TimeLimit=10,
                          agent='local',
-                         execfile='/Applications/CPLEX_Studio1210/cpoptimizer/bin/x86-64_osx/cpoptimizer')
+                         execfile='/Applications/CPLEX_Studio2211/cpoptimizer/bin/x86-64_osx/cpoptimizer')
 
         # Print solution
         if msol:
