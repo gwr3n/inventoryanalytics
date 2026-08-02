@@ -78,4 +78,5 @@ def fit_MA_q():
     plt.savefig('/Users/gwren/Downloads/46_ma_2_fit_forecasts.svg', format='svg')
     plt.show()
 
-fit_MA_q()
+if __name__ == "__main__":
+    fit_MA_q()

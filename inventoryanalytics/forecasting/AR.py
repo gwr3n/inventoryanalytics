@@ -63,5 +63,6 @@ def fit_AR_p():
     plt.savefig('/Users/gwren/Downloads/44_ar_1_fit_forecasts.svg', format='svg')
     f.show()
 
-fit_AR_p()
-plt.show()
+if __name__ == "__main__":
+    fit_AR_p()
+    plt.show()

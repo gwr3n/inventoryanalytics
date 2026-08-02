@@ -43,5 +43,6 @@ def plot_gaussian_process():
     plt.savefig('/Users/gwren/Downloads/2_gaussian_noise.eps', format='eps')
     py.show()
 
-# plot_dow_jones()
-plot_gaussian_process()
+if __name__ == "__main__":
+    # plot_dow_jones()
+    plot_gaussian_process()

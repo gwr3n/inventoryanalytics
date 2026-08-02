@@ -32,5 +32,6 @@ def plot_air_passenger_data_box_cox():
     plt.savefig('/Users/gwren/Downloads/30_airline_bc.eps', format='eps')
     plt.show()
 
-#plot_air_passenger_data()
-plot_air_passenger_data_box_cox()
+if __name__ == "__main__":
+    #plot_air_passenger_data()
+    plot_air_passenger_data_box_cox()

@@ -67,6 +67,7 @@ def predict(fig, ax):
     #plt.pause(1)
     #plt.cla()
 
-#differencing()
-fig, ax = plt.subplots()
-predict(fig, ax)
+if __name__ == "__main__":
+    #differencing()
+    fig, ax = plt.subplots()
+    predict(fig, ax)

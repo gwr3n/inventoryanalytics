@@ -85,36 +85,37 @@ def plot_methods(realisations, forecasts, test_window):
     plt.grid(True)
     f.show()
 
-N, t, window, m, test_window = 100, 80, 5, 5, [81,100]
-realisations = pd.Series(list(sample_seasonal_random_walk(N, m)), range(N))
-sma_forecasts = moving_average(realisations, window, t)
-naive_forecasts = naive(realisations, t)
-drift_forecasts = drift(realisations, t)
-seasonal_naive_forecasts = seasonal_naive(realisations, m, t)
-plot(realisations, seasonal_naive_forecasts, test_window) 
-plt.savefig('/Users/gwren/Downloads/23_training_test_data.svg', format='svg')
-methods = {
-    "Moving Average": sma_forecasts, 
-    "Naive": naive_forecasts, 
-    "Drift": drift_forecasts, 
-    "Seasonal naive": seasonal_naive_forecasts}
-plot_methods(realisations, methods, test_window) 
-plt.savefig('/Users/gwren/Downloads/24_seasonal_random_walk_forecasting_methods.svg', format='svg')
-print("MAE")
-for k in methods:
-    print(k,end=':\t')
-    print(mean_absolute_error(realisations[t+1:],methods[k][t+1:]))
-print("\nMSE")
-for k in methods:
-    print(k,end=':\t')
-    print(mean_squared_error(realisations[t+1:],methods[k][t+1:]))
-print("\nRMSE")
-for k in methods:
-    print(k,end=':\t')
-    print(math.sqrt(mean_squared_error(realisations[t+1:],methods[k][t+1:])))
-print("\nMAPE")
-for k in methods:
-    print(k,end=':\t')
-    print(mean_absolute_percentage_error(realisations[t+1:],methods[k][t+1:]))
-py.show() 
+if __name__ == "__main__":
+    N, t, window, m, test_window = 100, 80, 5, 5, [81,100]
+    realisations = pd.Series(list(sample_seasonal_random_walk(N, m)), range(N))
+    sma_forecasts = moving_average(realisations, window, t)
+    naive_forecasts = naive(realisations, t)
+    drift_forecasts = drift(realisations, t)
+    seasonal_naive_forecasts = seasonal_naive(realisations, m, t)
+    plot(realisations, seasonal_naive_forecasts, test_window) 
+    plt.savefig('/Users/gwren/Downloads/23_training_test_data.svg', format='svg')
+    methods = {
+        "Moving Average": sma_forecasts, 
+        "Naive": naive_forecasts, 
+        "Drift": drift_forecasts, 
+        "Seasonal naive": seasonal_naive_forecasts}
+    plot_methods(realisations, methods, test_window) 
+    plt.savefig('/Users/gwren/Downloads/24_seasonal_random_walk_forecasting_methods.svg', format='svg')
+    print("MAE")
+    for k in methods:
+        print(k,end=':\t')
+        print(mean_absolute_error(realisations[t+1:],methods[k][t+1:]))
+    print("\nMSE")
+    for k in methods:
+        print(k,end=':\t')
+        print(mean_squared_error(realisations[t+1:],methods[k][t+1:]))
+    print("\nRMSE")
+    for k in methods:
+        print(k,end=':\t')
+        print(math.sqrt(mean_squared_error(realisations[t+1:],methods[k][t+1:])))
+    print("\nMAPE")
+    for k in methods:
+        print(k,end=':\t')
+        print(mean_absolute_percentage_error(realisations[t+1:],methods[k][t+1:]))
+    py.show() 
 

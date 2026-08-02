@@ -82,5 +82,6 @@ def holt_winters_ci():
     plot_ci(realisations, pd.Series(np.nan, range(t+1)).append(forecasts.predicted_mean), forecasts_ci)
     py.show()
 
-holt_winters()
-# holt_winters_ci()
+if __name__ == "__main__":
+    holt_winters()
+    # holt_winters_ci()

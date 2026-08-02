@@ -127,7 +127,8 @@ def prediction_intervals_naive():
     plt.savefig('/Users/gwren/Downloads/28_prediction_intervals_naive.svg', format='svg')
     plt.show()
 
-#confidence_intervals()
-prediction_intervals_known_parameters()
-#prediction_intervals_unknown_parameters()
-#prediction_intervals_naive()
+if __name__ == "__main__":
+    #confidence_intervals()
+    prediction_intervals_known_parameters()
+    #prediction_intervals_unknown_parameters()
+    #prediction_intervals_naive()

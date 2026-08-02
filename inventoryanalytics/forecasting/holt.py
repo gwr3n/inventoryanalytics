@@ -80,5 +80,6 @@ def holt_ci():
     plt.savefig('/Users/gwren/Downloads/39_holt_forecasts_pi.svg', format='svg')
     py.show()
 
-holt()
-#holt_ci()
+if __name__ == "__main__":
+    holt()
+    #holt_ci()
