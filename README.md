@@ -6,7 +6,7 @@ A Python library dedicated to Inventory Analytics.
 
 ## Installation
 
-Inventory Analytics supports Python 3.8 through 3.10.
+Inventory Analytics supports Python 3.8 through 3.13.
 
 ```console
 python -m pip install .

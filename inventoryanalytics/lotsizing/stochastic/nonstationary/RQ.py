@@ -8,10 +8,7 @@ MIT License
 Copyright (c) 2018 Roberto Rossi
 '''
 
-import sys
 from docplex.mp.model import Model
-# sys.path.insert(0,'/Applications/CPLEX_Studio128/cplex/python/3.6/x86-64_osx')
-sys.path.insert(0,'/Applications/CPLEX_Studio1210/cplex/python/3.7/x86-64_osx')
 
 # http://ibmdecisionoptimization.github.io/docplex-doc/mp/creating_model.html
 # http://www-01.ibm.com/support/docview.wss?uid=swg27042869&aid=1
